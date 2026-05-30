@@ -1,0 +1,31 @@
+# OS
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Secrets
+.env
+.env.*
+
+# Raw data
+data/raw/
+
+# Large/intermediate generated data
+data/interim/
+
+# local notebooks
+notebooks/exploratory_only/
