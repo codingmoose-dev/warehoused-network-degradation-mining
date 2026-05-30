@@ -1,0 +1,7 @@
+metric,value
+row_count,50000
+column_count,72
+unique_session_count,5000
+unique_user_count,5000
+timestamp_min,2025-07-26 01:38:39.263265
+timestamp_max,2025-08-25 20:56:40.771630

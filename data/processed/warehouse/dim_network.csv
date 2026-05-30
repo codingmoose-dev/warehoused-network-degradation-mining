@@ -1,0 +1,118 @@
+network_id,network_type,operator_profile,infrastructure_profile
+network_2bb5450854eb,4G,Operator_A,Moderately_Degraded
+network_62ec98d7b1eb,4G,Operator_A,Nominal
+network_7c3efd374bb2,4G,Operator_A,Severely_Degraded
+network_08f6583af1c1,4G,Operator_B,Moderately_Degraded
+network_98a871740457,4G,Operator_B,Nominal
+network_bb94d81ea844,4G,Operator_B,Severely_Degraded
+network_8b402a4586c5,4G,Operator_C,Moderately_Degraded
+network_813757838c4f,4G,Operator_C,Nominal
+network_56f338a4594a,4G,Operator_C,Severely_Degraded
+network_dad1fb1bff7b,4G,Operator_D,Moderately_Degraded
+network_07ca5eeb8636,4G,Operator_D,Nominal
+network_4ebc2511dd8a,4G,Operator_D,Severely_Degraded
+network_458ebe784b32,4G,Operator_E,Moderately_Degraded
+network_0629452e7a55,4G,Operator_E,Nominal
+network_f73c615d9339,4G,Operator_E,Severely_Degraded
+network_f7a1201031e2,4G,Operator_F,Moderately_Degraded
+network_814bfbf32c0e,4G,Operator_F,Nominal
+network_e1424a644b9f,4G,Operator_F,Severely_Degraded
+network_a2ee958b261b,4G,Operator_G,Moderately_Degraded
+network_e37d221758c2,4G,Operator_G,Nominal
+network_b970e4e8e92e,4G,Operator_G,Severely_Degraded
+network_4cd9f0261d3d,4G,Operator_H,Moderately_Degraded
+network_5c8898fe040a,4G,Operator_H,Nominal
+network_cd8dfd8b4dee,4G,Operator_H,Severely_Degraded
+network_b1326286e9a5,4G,Operator_I,Moderately_Degraded
+network_d36cf433711a,4G,Operator_I,Nominal
+network_7c6c9be02ea5,4G,Operator_I,Severely_Degraded
+network_66402c27598f,4G,Operator_J,Moderately_Degraded
+network_973f8c979499,4G,Operator_J,Nominal
+network_73794dfe2ab0,4G,Operator_J,Severely_Degraded
+network_b8258bd83f70,4G,Operator_K,Moderately_Degraded
+network_c0724af3dec7,4G,Operator_K,Nominal
+network_c4c3300ff2a5,4G,Operator_K,Severely_Degraded
+network_acdfeb2d53b7,4G,Operator_L,Moderately_Degraded
+network_318a6ebc4fee,4G,Operator_L,Nominal
+network_a17d6ec636a3,4G,Operator_L,Severely_Degraded
+network_e3f20812f591,4G,Operator_M,Moderately_Degraded
+network_b94ff28c842f,4G,Operator_M,Nominal
+network_0f6ca630277a,4G,Operator_M,Severely_Degraded
+network_13feea37798a,5G NSA,Operator_A,Moderately_Degraded
+network_b64266e24a0d,5G NSA,Operator_A,Nominal
+network_14b38fbe49da,5G NSA,Operator_A,Severely_Degraded
+network_2fb7ed54f8ac,5G NSA,Operator_B,Moderately_Degraded
+network_d2b3964012e6,5G NSA,Operator_B,Nominal
+network_d6b74b7edfdb,5G NSA,Operator_B,Severely_Degraded
+network_9f3c629244db,5G NSA,Operator_C,Moderately_Degraded
+network_5193d88c50c1,5G NSA,Operator_C,Nominal
+network_736713a4adbb,5G NSA,Operator_C,Severely_Degraded
+network_23c00a45c6c6,5G NSA,Operator_D,Moderately_Degraded
+network_570c76a813cc,5G NSA,Operator_D,Nominal
+network_4cde1787cde5,5G NSA,Operator_D,Severely_Degraded
+network_3ad5b8ba2b30,5G NSA,Operator_E,Moderately_Degraded
+network_8171fbdf20ef,5G NSA,Operator_E,Nominal
+network_8ab9ebd4d054,5G NSA,Operator_E,Severely_Degraded
+network_942b8619dc0a,5G NSA,Operator_F,Moderately_Degraded
+network_6ea564bcc1db,5G NSA,Operator_F,Nominal
+network_11aed2b19e77,5G NSA,Operator_F,Severely_Degraded
+network_8eaefce6bc3a,5G NSA,Operator_G,Moderately_Degraded
+network_0c5f991b7bb8,5G NSA,Operator_G,Nominal
+network_a98e6572fb95,5G NSA,Operator_G,Severely_Degraded
+network_c7337942caae,5G NSA,Operator_H,Moderately_Degraded
+network_1038656ff394,5G NSA,Operator_H,Nominal
+network_664bf5f76c13,5G NSA,Operator_H,Severely_Degraded
+network_7384c07b5f72,5G NSA,Operator_I,Moderately_Degraded
+network_9ab8b60c7a3d,5G NSA,Operator_I,Nominal
+network_22becdb77f38,5G NSA,Operator_I,Severely_Degraded
+network_7027a8fe43e8,5G NSA,Operator_J,Moderately_Degraded
+network_25023343508a,5G NSA,Operator_J,Nominal
+network_48027dbd0e04,5G NSA,Operator_J,Severely_Degraded
+network_e17906227d07,5G NSA,Operator_K,Moderately_Degraded
+network_48764cea8c2b,5G NSA,Operator_K,Nominal
+network_8164816982ca,5G NSA,Operator_K,Severely_Degraded
+network_d71c27c22e5a,5G NSA,Operator_L,Moderately_Degraded
+network_1f59cb5ca229,5G NSA,Operator_L,Nominal
+network_b0ccc6d5f23e,5G NSA,Operator_L,Severely_Degraded
+network_b6122bfd0468,5G NSA,Operator_M,Moderately_Degraded
+network_ca45a2d95440,5G NSA,Operator_M,Nominal
+network_e13d220547b6,5G NSA,Operator_M,Severely_Degraded
+network_62406ea2b065,5G SA,Operator_A,Moderately_Degraded
+network_287a00cb8184,5G SA,Operator_A,Nominal
+network_2c4d2fd6af2e,5G SA,Operator_A,Severely_Degraded
+network_ba2595012943,5G SA,Operator_B,Moderately_Degraded
+network_b575d15bb7d2,5G SA,Operator_B,Nominal
+network_e93950b08f81,5G SA,Operator_B,Severely_Degraded
+network_5b2ba810063a,5G SA,Operator_C,Moderately_Degraded
+network_ffecb3b6d29b,5G SA,Operator_C,Nominal
+network_206bd81eaf8e,5G SA,Operator_C,Severely_Degraded
+network_f02a85b173fd,5G SA,Operator_D,Moderately_Degraded
+network_601a9c748587,5G SA,Operator_D,Nominal
+network_d99f54f57228,5G SA,Operator_D,Severely_Degraded
+network_a719c3ce1dc8,5G SA,Operator_E,Moderately_Degraded
+network_2ed9bcc13d80,5G SA,Operator_E,Nominal
+network_8b00011f8b31,5G SA,Operator_E,Severely_Degraded
+network_2eebdae5fceb,5G SA,Operator_F,Moderately_Degraded
+network_fcfb92a21f97,5G SA,Operator_F,Nominal
+network_e1c8fd03b4a8,5G SA,Operator_F,Severely_Degraded
+network_ff3cb867d79b,5G SA,Operator_G,Moderately_Degraded
+network_8b694762f4a9,5G SA,Operator_G,Nominal
+network_6b1e15a4ca54,5G SA,Operator_G,Severely_Degraded
+network_fd2a8563693c,5G SA,Operator_H,Moderately_Degraded
+network_89f1fbc62179,5G SA,Operator_H,Nominal
+network_8166dea73175,5G SA,Operator_H,Severely_Degraded
+network_66fbfbb6fd6e,5G SA,Operator_I,Moderately_Degraded
+network_c97dd4693873,5G SA,Operator_I,Nominal
+network_4ff9585d7fc2,5G SA,Operator_I,Severely_Degraded
+network_03d1325fdd75,5G SA,Operator_J,Moderately_Degraded
+network_9c1d058c1809,5G SA,Operator_J,Nominal
+network_1b5c05058527,5G SA,Operator_J,Severely_Degraded
+network_7f128124c616,5G SA,Operator_K,Moderately_Degraded
+network_4f2bc310479f,5G SA,Operator_K,Nominal
+network_a37d417a6483,5G SA,Operator_K,Severely_Degraded
+network_79bc09af0d1d,5G SA,Operator_L,Moderately_Degraded
+network_2c55a7d13a7c,5G SA,Operator_L,Nominal
+network_a49a4cfdf394,5G SA,Operator_L,Severely_Degraded
+network_cb86e83cc910,5G SA,Operator_M,Moderately_Degraded
+network_7045aadce4d4,5G SA,Operator_M,Nominal
+network_67faece05581,5G SA,Operator_M,Severely_Degraded

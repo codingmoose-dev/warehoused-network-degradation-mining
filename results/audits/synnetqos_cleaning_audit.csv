@@ -1,0 +1,10 @@
+check_name,check_value,status
+raw_row_count,50000,ok
+output_row_count,50000,ok
+row_count_preserved,True,ok
+raw_column_count,67,ok
+output_column_count,72,ok
+duplicate_standard_column_base_count,0,ok
+timestamp_parse_failure_count,0,ok
+duplicate_measurement_id_count,0,ok
+duplicate_session_timestamp_count,0,ok

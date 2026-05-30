@@ -1,0 +1,4 @@
+device_id,ue_profile,ue_capability_class
+device_acbd033911d7,UE-Advanced,Advanced
+device_f6704922da00,UE-Basic,Basic
+device_6185fc519724,UE-Standard,Standard

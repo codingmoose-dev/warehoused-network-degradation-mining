@@ -1,0 +1,16 @@
+environment_id,weather,obstruction_level,is_indoor
+environment_fd762b954b1b,Clear,High,True
+environment_559974aa5152,Clear,Low,False
+environment_d9a76321b139,Clear,Low,True
+environment_6bb08576a838,Clear,Medium,False
+environment_3c23aab0af0a,Clear,Medium,True
+environment_199a07228b37,Foggy,High,True
+environment_8c6f42926c88,Foggy,Low,False
+environment_d4f8d310c297,Foggy,Low,True
+environment_57f488e7a3c2,Foggy,Medium,False
+environment_bdf646b98c74,Foggy,Medium,True
+environment_3254b712c09e,Rainy,High,True
+environment_aa98cdc36293,Rainy,Low,False
+environment_ec9ada490a35,Rainy,Low,True
+environment_a0811c3c4fe4,Rainy,Medium,False
+environment_46b4493d98e8,Rainy,Medium,True
