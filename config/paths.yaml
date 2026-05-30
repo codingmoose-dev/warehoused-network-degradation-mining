@@ -1,0 +1,37 @@
+raw:
+  synnetqos: data/raw/synnetqos/synnetqos-dataset.csv
+  vienna_4g5g: data/raw/vienna_4g5g/
+  campus_qos: data/raw/campus_qos/
+  ucc_5g_context: data/raw/ucc_5g_context/
+  simulator_reference: data/raw/simulator_reference/
+
+interim:
+  synnetqos_core: data/interim/synnetqos/synnetqos_core_clean.csv
+  external_reference_dir: data/interim/external_reference/
+
+processed:
+  warehouse_dir: data/processed/warehouse/
+  mining_tables_dir: data/processed/mining_tables/
+  graph_nodes_dir: data/processed/graph/nodes/
+  graph_edges_dir: data/processed/graph/edges/
+
+results:
+  audits_dir: results/audits/
+  warehouse_dir: results/warehouse/
+  descriptive_mining_dir: results/descriptive_mining/
+  supervised_dir: results/supervised/
+  decision_tree_rules_dir: results/decision_tree_rules/
+  clustering_dir: results/clustering/
+  association_rules_dir: results/association_rules/
+  external_reference_dir: results/external_reference/
+  graph_dir: results/graph/
+
+figures:
+  warehouse_dir: figures/warehouse/
+  descriptive_mining_dir: figures/descriptive_mining/
+  supervised_dir: figures/supervised/
+  decision_tree_dir: figures/decision_tree/
+  clustering_dir: figures/clustering/
+  association_rules_dir: figures/association_rules/
+  external_reference_dir: figures/external_reference/
+  graph_dir: figures/graph/

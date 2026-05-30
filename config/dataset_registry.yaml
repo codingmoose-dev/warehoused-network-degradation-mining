@@ -1,0 +1,59 @@
+datasets:
+  D0:
+    name: SynNetQoS dataset
+    role: main_warehouse_and_mining_dataset
+    priority: mandatory
+    raw_path: data/raw/synnetqos/synnetqos-dataset.csv
+    processed_path: data/interim/synnetqos/synnetqos_core_clean.csv
+    analysis_uses:
+      - warehouse_construction
+      - descriptive_mining
+      - supervised_classification
+      - decision_tree_rules
+      - clustering
+      - association_rules
+      - optional_graph_mining
+    merge_policy: main_dataset_only
+
+  D1:
+    name: Vienna 4G/5G Drive-Test Dataset
+    role: external_measurement_reference
+    priority: high_external_value
+    raw_path: data/raw/vienna_4g5g/Vienna-full-4G-5G-dataset-v1.0.3/
+    processed_path: data/interim/external_reference/vienna_reference_clean.csv
+    analysis_uses:
+      - selected_variable_comparison
+      - external_reference_distribution_check
+    merge_policy: do_not_merge_blindly
+
+  D2:
+    name: UCC Beyond Throughput 5G dataset
+    role: external_measurement_reference
+    priority: high_external_value
+    raw_path: data/raw/ucc_5g_context/5G-production-dataset/
+    processed_path: data/interim/external_reference/ucc_5g_reference_clean.csv
+    analysis_uses:
+      - selected_variable_comparison
+      - channel_context_application_pattern_comparison
+    merge_policy: do_not_merge_blindly
+
+  D3:
+    name: 5G Campus Network QoS Dataset
+    role: external_measurement_reference
+    priority: medium_external_value
+    raw_path: data/raw/campus_qos/
+    processed_path: data/interim/external_reference/campus_qos_reference_clean.csv
+    analysis_uses:
+      - controlled_testbed_comparison
+      - delay_throughput_reference
+    merge_policy: do_not_merge_blindly
+
+  D4:
+    name: ns-3 5G-LENA simulator traces
+    role: optional_simulator_reference
+    priority: optional
+    raw_path: data/raw/simulator_reference/
+    processed_path: data/interim/external_reference/simulator_reference_clean.csv
+    analysis_uses:
+      - optional_controlled_simulation_reference
+    merge_policy: optional_only
