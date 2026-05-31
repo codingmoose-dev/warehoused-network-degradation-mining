@@ -12,7 +12,6 @@ from network_degradation_mining.io import (
     write_csv,
 )
 
-
 STANDARD_COLUMNS = [
     "reference_record_id",
     "source_dataset",

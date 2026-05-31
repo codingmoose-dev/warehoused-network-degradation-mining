@@ -8,7 +8,6 @@ import pandas as pd
 
 from network_degradation_mining.io import read_csv, write_csv
 
-
 BOOLEAN_TRUE_VALUES = {"true", "1", "yes", "y"}
 BOOLEAN_FALSE_VALUES = {"false", "0", "no", "n"}
 BOOLEAN_VALUES = BOOLEAN_TRUE_VALUES | BOOLEAN_FALSE_VALUES

@@ -14,7 +14,6 @@ from network_degradation_mining.schema import (
     DimensionSpec,
 )
 
-
 MISSING_TOKEN = "<missing>"
 
 

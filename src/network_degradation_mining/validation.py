@@ -10,7 +10,6 @@ import pandas as pd
 from network_degradation_mining.config import get_dataset_items, resolve_project_path
 from network_degradation_mining.io import ensure_directory, write_csv
 
-
 SUPPORTED_TABLE_EXTENSIONS = {".csv", ".parquet"}
 
 
