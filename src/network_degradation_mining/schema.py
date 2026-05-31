@@ -41,13 +41,9 @@ RADIO_COLUMNS = (
     "band",
 )
 
-APPLICATION_COLUMNS = (
-    "app_type",
-)
+APPLICATION_COLUMNS = ("app_type",)
 
-MOBILITY_COLUMNS = (
-    "movement_speed",
-)
+MOBILITY_COLUMNS = ("movement_speed",)
 
 ENVIRONMENT_COLUMNS = (
     "weather",

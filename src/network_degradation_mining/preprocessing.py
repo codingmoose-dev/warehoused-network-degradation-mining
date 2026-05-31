@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import json
 import re
 from pathlib import Path
 from typing import Any
@@ -71,7 +70,9 @@ def _strip_text_columns(dataframe: pd.DataFrame) -> pd.DataFrame:
     output = dataframe.copy()
 
     for column in output.columns:
-        if pd.api.types.is_object_dtype(output[column]) or pd.api.types.is_string_dtype(output[column]):
+        if pd.api.types.is_object_dtype(output[column]) or pd.api.types.is_string_dtype(
+            output[column]
+        ):
             output[column] = output[column].astype("string").str.strip()
 
     return output
@@ -87,24 +88,31 @@ def _coerce_boolean_like_columns(dataframe: pd.DataFrame) -> pd.DataFrame:
             output[column] = series.astype("boolean")
             continue
 
-        if not (pd.api.types.is_object_dtype(series) or pd.api.types.is_string_dtype(series)):
+        if not (
+            pd.api.types.is_object_dtype(series) or pd.api.types.is_string_dtype(series)
+        ):
             continue
 
         normalized = series.dropna().astype("string").str.strip().str.lower()
         unique_values = set(normalized.unique().tolist())
 
         if unique_values and unique_values.issubset(BOOLEAN_VALUES):
-            mapped = series.astype("string").str.strip().str.lower().map(
-                {
-                    "true": True,
-                    "1": True,
-                    "yes": True,
-                    "y": True,
-                    "false": False,
-                    "0": False,
-                    "no": False,
-                    "n": False,
-                }
+            mapped = (
+                series.astype("string")
+                .str.strip()
+                .str.lower()
+                .map(
+                    {
+                        "true": True,
+                        "1": True,
+                        "yes": True,
+                        "y": True,
+                        "false": False,
+                        "0": False,
+                        "no": False,
+                        "n": False,
+                    }
+                )
             )
             output[column] = mapped.astype("boolean")
 
@@ -143,11 +151,17 @@ def _add_stable_fields(dataframe: pd.DataFrame) -> pd.DataFrame:
     ]
 
     if sort_columns:
-        output = output.sort_values(sort_columns, kind="mergesort").reset_index(drop=True)
+        output = output.sort_values(sort_columns, kind="mergesort").reset_index(
+            drop=True
+        )
 
     if "session_id" in output.columns:
-        output["session_step_index"] = output.groupby("session_id", sort=False).cumcount() + 1
-        output["session_record_count"] = output.groupby("session_id")["session_id"].transform("size")
+        output["session_step_index"] = (
+            output.groupby("session_id", sort=False).cumcount() + 1
+        )
+        output["session_record_count"] = output.groupby("session_id")[
+            "session_id"
+        ].transform("size")
 
     return output
 
@@ -185,7 +199,12 @@ def _build_value_profile(dataframe: pd.DataFrame, max_values: int = 25) -> pd.Da
         if unique_count > max_values:
             continue
 
-        value_counts = series.astype("string").fillna("<missing>").value_counts(dropna=False).head(max_values)
+        value_counts = (
+            series.astype("string")
+            .fillna("<missing>")
+            .value_counts(dropna=False)
+            .head(max_values)
+        )
 
         for value, count in value_counts.items():
             rows.append(
@@ -193,7 +212,9 @@ def _build_value_profile(dataframe: pd.DataFrame, max_values: int = 25) -> pd.Da
                     "column_name": column,
                     "value": value,
                     "count": int(count),
-                    "fraction": float(count / len(dataframe)) if len(dataframe) else 0.0,
+                    "fraction": float(count / len(dataframe))
+                    if len(dataframe)
+                    else 0.0,
                     "unique_count": unique_count,
                 }
             )
@@ -206,7 +227,9 @@ def _build_cleaning_audit(
     clean_dataframe: pd.DataFrame,
     column_mapping: pd.DataFrame,
 ) -> pd.DataFrame:
-    duplicate_measurement_ids = int(clean_dataframe["measurement_id"].duplicated().sum())
+    duplicate_measurement_ids = int(
+        clean_dataframe["measurement_id"].duplicated().sum()
+    )
 
     timestamp_parse_failures: int | None = None
     if "timestamp_parse_failed" in clean_dataframe.columns:
@@ -214,7 +237,9 @@ def _build_cleaning_audit(
 
     duplicate_session_timestamps: int | None = None
     if {"session_id", "timestamp"}.issubset(clean_dataframe.columns):
-        duplicate_session_timestamps = int(clean_dataframe.duplicated(["session_id", "timestamp"]).sum())
+        duplicate_session_timestamps = int(
+            clean_dataframe.duplicated(["session_id", "timestamp"]).sum()
+        )
 
     duplicate_base_names = int(column_mapping["duplicate_base_name"].sum())
 
@@ -329,7 +354,9 @@ def prepare_synnetqos_core(
     raw = read_csv(input_path, low_memory=False)
 
     column_mapping = build_column_mapping(list(raw.columns))
-    rename_map = dict(zip(column_mapping["source_column"], column_mapping["standard_column"]))
+    rename_map = dict(
+        zip(column_mapping["source_column"], column_mapping["standard_column"])
+    )
 
     clean = raw.rename(columns=rename_map)
     clean = _strip_text_columns(clean)
@@ -357,7 +384,8 @@ def prepare_synnetqos_core(
         "synnetqos_core": output_path,
         "synnetqos_cleaning_audit": audit_dir / "synnetqos_cleaning_audit.csv",
         "synnetqos_column_mapping": audit_dir / "synnetqos_column_mapping.csv",
-        "synnetqos_missingness_summary": audit_dir / "synnetqos_missingness_summary.csv",
+        "synnetqos_missingness_summary": audit_dir
+        / "synnetqos_missingness_summary.csv",
         "synnetqos_value_profile": audit_dir / "synnetqos_value_profile.csv",
         "synnetqos_dataset_summary": audit_dir / "synnetqos_dataset_summary.csv",
     }
