@@ -84,14 +84,18 @@ def build_dimension(dataframe: pd.DataFrame, spec: DimensionSpec) -> pd.DataFram
         return pd.DataFrame(columns=[spec.id_column])
 
     dimension = dataframe[source_columns].drop_duplicates().copy()
-    dimension = dimension.sort_values(source_columns, kind="mergesort").reset_index(drop=True)
+    dimension = dimension.sort_values(source_columns, kind="mergesort").reset_index(
+        drop=True
+    )
 
     prefix = _dimension_prefix(spec.id_column)
     dimension.insert(
         0,
         spec.id_column,
         [
-            _hash_key(prefix=prefix, values=tuple(row[column] for column in source_columns))
+            _hash_key(
+                prefix=prefix, values=tuple(row[column] for column in source_columns)
+            )
             for _, row in dimension.iterrows()
         ],
     )
@@ -99,8 +103,12 @@ def build_dimension(dataframe: pd.DataFrame, spec: DimensionSpec) -> pd.DataFram
     return dimension
 
 
-def _build_dimension_lookup(dimension: pd.DataFrame, spec: DimensionSpec) -> dict[tuple[Any, ...], str]:
-    source_columns = [column for column in spec.source_columns if column in dimension.columns]
+def _build_dimension_lookup(
+    dimension: pd.DataFrame, spec: DimensionSpec
+) -> dict[tuple[Any, ...], str]:
+    source_columns = [
+        column for column in spec.source_columns if column in dimension.columns
+    ]
 
     if not source_columns:
         return {}
@@ -129,7 +137,9 @@ def _attach_dimension_id(
     lookup = _build_dimension_lookup(dimension, spec)
 
     keys = source[source_columns].apply(
-        lambda row: tuple(_normalize_key_value(row[column]) for column in source_columns),
+        lambda row: tuple(
+            _normalize_key_value(row[column]) for column in source_columns
+        ),
         axis=1,
     )
 
@@ -137,7 +147,9 @@ def _attach_dimension_id(
     return fact
 
 
-def build_fact_table(dataframe: pd.DataFrame, dimensions: dict[str, pd.DataFrame]) -> pd.DataFrame:
+def build_fact_table(
+    dataframe: pd.DataFrame, dimensions: dict[str, pd.DataFrame]
+) -> pd.DataFrame:
     identifier_columns = _available_columns(dataframe, FACT_IDENTIFIER_COLUMNS)
     measure_columns = _available_columns(dataframe, FACT_MEASURE_COLUMNS)
 
@@ -153,7 +165,9 @@ def build_fact_table(dataframe: pd.DataFrame, dimensions: dict[str, pd.DataFrame
 
     id_columns = [spec.id_column for spec in DIMENSIONS]
     leading_columns = _available_columns(fact, FACT_IDENTIFIER_COLUMNS) + id_columns
-    remaining_columns = [column for column in fact.columns if column not in leading_columns]
+    remaining_columns = [
+        column for column in fact.columns if column not in leading_columns
+    ]
 
     return fact[leading_columns + remaining_columns]
 
@@ -219,7 +233,9 @@ def build_warehouse_integrity_summary(
             )
 
         if spec.id_column in dimension.columns:
-            duplicate_dimension_id_count = int(dimension[spec.id_column].duplicated().sum())
+            duplicate_dimension_id_count = int(
+                dimension[spec.id_column].duplicated().sum()
+            )
             rows.append(
                 {
                     "check_name": "duplicate_dimension_id_count",
@@ -299,10 +315,7 @@ def build_warehouse_tables(
 
     source = prepare_warehouse_source(read_csv(input_path, low_memory=False))
 
-    dimensions = {
-        spec.table_name: build_dimension(source, spec)
-        for spec in DIMENSIONS
-    }
+    dimensions = {spec.table_name: build_dimension(source, spec) for spec in DIMENSIONS}
 
     fact = build_fact_table(source, dimensions)
 

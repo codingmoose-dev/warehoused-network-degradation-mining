@@ -1,6 +1,6 @@
 dataset_id,dataset_name,role,priority,raw_path,exists,is_file,is_dir,file_count,supported_table_count,total_size_bytes,audit_status,error_message
-D0,SynNetQoS dataset,main_warehouse_and_mining_dataset,mandatory,data/raw/synnetqos/synnetqos-dataset.csv,True,True,False,1,1,23913799,ok,
-D1,Vienna 4G/5G Drive-Test Dataset,external_measurement_reference,high_external_value,data/raw/vienna_4g5g/Vienna-full-4G-5G-dataset-v1.0.3,True,False,True,13,6,66554081,ok,
-D2,UCC Beyond Throughput 5G dataset,external_measurement_reference,high_external_value,data/raw/ucc_5g_context/5G-production-dataset,True,False,True,83,83,23316242,ok,
-D3,5G Campus Network QoS Dataset,external_measurement_reference,medium_external_value,data/raw/campus_qos,True,False,True,3,2,59001,ok,
-D4,ns-3 5G-LENA simulator traces,optional_simulator_reference,optional,data/raw/simulator_reference,True,False,True,0,0,0,ok,
+synnetqos,SynNetQoS dataset,main_warehouse_and_mining_dataset,mandatory,data/raw/synnetqos/synnetqos-dataset.csv,True,True,False,1,1,23913799,ok,
+vienna_4g5g,Vienna 4G/5G Drive-Test Dataset,external_measurement_reference,high_external_value,data/raw/vienna_4g5g/Vienna-full-4G-5G-dataset-v1.0.3,True,False,True,13,6,66554081,ok,
+campus_qos,5G Campus Network QoS Dataset,external_measurement_reference,medium_external_value,data/raw/campus_qos,True,False,True,3,2,59001,ok,
+ucc_5g_context,UCC Beyond Throughput 5G dataset,external_measurement_reference,high_external_value,data/raw/ucc_5g_context/5G-production-dataset,True,False,True,83,83,23316242,ok,
+ns3_lena,ns-3 5G-LENA controlled simulator traces,controlled_simulator_reference,included_controlled_reference,data/raw/simulator_reference,True,False,True,25,13,14847,ok,

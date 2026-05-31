@@ -10,11 +10,11 @@ SRC = ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
-from network_degradation_mining.config import load_paths, resolve_project_path
-from network_degradation_mining.preprocessing import prepare_synnetqos_core
-
 
 def main() -> None:
+    from network_degradation_mining.config import load_paths, resolve_project_path
+    from network_degradation_mining.preprocessing import prepare_synnetqos_core
+
     paths = load_paths(ROOT / "config" / "paths.yaml")
 
     input_path = resolve_project_path(paths["raw"]["synnetqos"], ROOT)

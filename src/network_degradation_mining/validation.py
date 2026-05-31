@@ -47,7 +47,9 @@ def _read_csv_sample(path: Path, sample_rows: int) -> pd.DataFrame:
     return pd.read_csv(path, nrows=sample_rows, low_memory=False)
 
 
-def _inspect_csv(path: Path, sample_rows: int) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+def _inspect_csv(
+    path: Path, sample_rows: int
+) -> tuple[dict[str, Any], list[dict[str, Any]]]:
     try:
         sample = _read_csv_sample(path, sample_rows)
         row_count = _count_csv_rows(path)
@@ -74,7 +76,9 @@ def _inspect_csv(path: Path, sample_rows: int) -> tuple[dict[str, Any], list[dic
         )
 
 
-def _inspect_parquet(path: Path, sample_rows: int) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+def _inspect_parquet(
+    path: Path, sample_rows: int
+) -> tuple[dict[str, Any], list[dict[str, Any]]]:
     try:
         row_count: int | None = None
 
@@ -127,7 +131,9 @@ def _build_column_rows(sample: pd.DataFrame, sample_rows: int) -> list[dict[str,
                 "dtype_in_sample": str(series.dtype),
                 "sample_size": observed_rows,
                 "sample_missing_count": int(series.isna().sum()),
-                "sample_missing_fraction": float(series.isna().mean()) if observed_rows > 0 else 0.0,
+                "sample_missing_fraction": float(series.isna().mean())
+                if observed_rows > 0
+                else 0.0,
                 "example_values": json.dumps(examples, ensure_ascii=False),
                 "sample_row_limit": int(sample_rows),
             }
@@ -136,7 +142,9 @@ def _build_column_rows(sample: pd.DataFrame, sample_rows: int) -> list[dict[str,
     return rows
 
 
-def _inspect_table(path: Path, sample_rows: int) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+def _inspect_table(
+    path: Path, sample_rows: int
+) -> tuple[dict[str, Any], list[dict[str, Any]]]:
     suffix = path.suffix.lower()
 
     if suffix == ".csv":
@@ -207,9 +215,13 @@ def audit_raw_inputs(
                 "is_dir": raw_path.is_dir(),
                 "file_count": len(files),
                 "supported_table_count": len(supported_files),
-                "total_size_bytes": sum(path.stat().st_size for path in files if path.exists()),
+                "total_size_bytes": sum(
+                    path.stat().st_size for path in files if path.exists()
+                ),
                 "audit_status": "ok" if raw_path.exists() else "missing",
-                "error_message": "" if raw_path.exists() else "Raw path does not exist.",
+                "error_message": ""
+                if raw_path.exists()
+                else "Raw path does not exist.",
             }
         )
 
@@ -239,7 +251,9 @@ def audit_raw_inputs(
                 )
                 continue
 
-            file_summary, file_column_rows = _inspect_table(file_path, sample_rows=sample_rows)
+            file_summary, file_column_rows = _inspect_table(
+                file_path, sample_rows=sample_rows
+            )
 
             file_rows.append({**file_base, **file_summary})
 

@@ -1,0 +1,13 @@
+source_dataset,check_name,check_value,status
+vienna_4g5g,row_count,3895145,ok
+vienna_4g5g,column_count,33,ok
+vienna_4g5g,duplicate_reference_record_id_count,0,ok
+campus_qos,row_count,302,ok
+campus_qos,column_count,33,ok
+campus_qos,duplicate_reference_record_id_count,0,ok
+ucc_5g_context,row_count,188711,ok
+ucc_5g_context,column_count,33,ok
+ucc_5g_context,duplicate_reference_record_id_count,0,ok
+ns3_lena,row_count,12,ok
+ns3_lena,column_count,33,ok
+ns3_lena,duplicate_reference_record_id_count,0,ok

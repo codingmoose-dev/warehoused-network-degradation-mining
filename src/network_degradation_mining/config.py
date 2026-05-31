@@ -36,7 +36,11 @@ def load_yaml(path: str | Path) -> dict[str, Any]:
 
 
 def load_dataset_registry(path: str | Path | None = None) -> dict[str, Any]:
-    registry_path = Path(path) if path is not None else project_root() / "config" / "dataset_registry.yaml"
+    registry_path = (
+        Path(path)
+        if path is not None
+        else project_root() / "config" / "dataset_registry.yaml"
+    )
     registry = load_yaml(registry_path)
 
     datasets = registry.get("datasets")
@@ -47,7 +51,9 @@ def load_dataset_registry(path: str | Path | None = None) -> dict[str, Any]:
 
 
 def load_paths(path: str | Path | None = None) -> dict[str, Any]:
-    paths_path = Path(path) if path is not None else project_root() / "config" / "paths.yaml"
+    paths_path = (
+        Path(path) if path is not None else project_root() / "config" / "paths.yaml"
+    )
     return load_yaml(paths_path)
 
 

@@ -5,6 +5,7 @@
 __pycache__/
 *.py[cod]
 *.egg-info/
+.eggs/
 .pytest_cache/
 .ruff_cache/
 .mypy_cache/
@@ -22,10 +23,27 @@ env/
 .env.*
 
 # Raw data
-data/raw/
+data/raw/*
+!data/raw/.gitkeep
+!data/raw/simulator_reference/
+data/raw/simulator_reference/**
+!data/raw/simulator_reference/ns3_lena_simple_qos/
+!data/raw/simulator_reference/ns3_lena_simple_qos/**/
+!data/raw/simulator_reference/ns3_lena_simple_qos/run_manifest.csv
+!data/raw/simulator_reference/ns3_lena_simple_qos/**/run_summary.csv
+!data/raw/simulator_reference/ns3_lena_simple_qos/**/flow_stats.txt
+!data/raw/simulator_reference/ns3_lena_simple_qos/**/flow_summary.csv
+!data/raw/simulator_reference/ns3_lena_simple_qos/**/summary.csv
 
-# Large/intermediate generated data
+# Large simulator outputs
+*.pcap
+*.pcapng
+*.anim
+*.tr
+*.trace
+
+# Generated intermediate data
 data/interim/
 
-# local notebooks
+# Local notebooks
 notebooks/exploratory_only/
