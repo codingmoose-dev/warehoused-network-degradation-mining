@@ -1,8 +1,8 @@
 raw:
   synnetqos: data/raw/synnetqos/synnetqos-dataset.csv
-  vienna_4g5g: data/raw/vienna_4g5g/
+  vienna_4g5g: data/raw/vienna_4g5g/Vienna-full-4G-5G-dataset-v1.0.3/
   campus_qos: data/raw/campus_qos/
-  ucc_5g_context: data/raw/ucc_5g_context/
+  ucc_5g_context: data/raw/ucc_5g_context/5G-production-dataset/
   simulator_reference: data/raw/simulator_reference/
 
 interim:

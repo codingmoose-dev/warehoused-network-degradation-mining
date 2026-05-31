@@ -1,5 +1,5 @@
 datasets:
-  D0:
+  synnetqos:
     name: SynNetQoS dataset
     role: main_warehouse_and_mining_dataset
     priority: mandatory
@@ -12,10 +12,10 @@ datasets:
       - decision_tree_rules
       - clustering
       - association_rules
-      - optional_graph_mining
+      - graph_mining
     merge_policy: main_dataset_only
 
-  D1:
+  vienna_4g5g:
     name: Vienna 4G/5G Drive-Test Dataset
     role: external_measurement_reference
     priority: high_external_value
@@ -24,9 +24,24 @@ datasets:
     analysis_uses:
       - selected_variable_comparison
       - external_reference_distribution_check
-    merge_policy: do_not_merge_blindly
+      - radio_signal_reference
+      - throughput_reference
+    merge_policy: external_reference_only
 
-  D2:
+  campus_qos:
+    name: 5G Campus Network QoS Dataset
+    role: external_measurement_reference
+    priority: medium_external_value
+    raw_path: data/raw/campus_qos/
+    processed_path: data/interim/external_reference/campus_qos_reference_clean.csv
+    analysis_uses:
+      - controlled_testbed_comparison
+      - throughput_reference
+      - jitter_reference
+      - packet_loss_reference
+    merge_policy: external_reference_only
+
+  ucc_5g_context:
     name: UCC Beyond Throughput 5G dataset
     role: external_measurement_reference
     priority: high_external_value
@@ -35,25 +50,17 @@ datasets:
     analysis_uses:
       - selected_variable_comparison
       - channel_context_application_pattern_comparison
-    merge_policy: do_not_merge_blindly
+      - production_trace_reference
+    merge_policy: external_reference_only
 
-  D3:
-    name: 5G Campus Network QoS Dataset
-    role: external_measurement_reference
-    priority: medium_external_value
-    raw_path: data/raw/campus_qos/
-    processed_path: data/interim/external_reference/campus_qos_reference_clean.csv
-    analysis_uses:
-      - controlled_testbed_comparison
-      - delay_throughput_reference
-    merge_policy: do_not_merge_blindly
-
-  D4:
-    name: ns-3 5G-LENA simulator traces
-    role: optional_simulator_reference
-    priority: optional
+  ns3_lena:
+    name: ns-3 5G-LENA controlled simulator traces
+    role: controlled_simulator_reference
+    priority: included_controlled_reference
     raw_path: data/raw/simulator_reference/
     processed_path: data/interim/external_reference/simulator_reference_clean.csv
     analysis_uses:
-      - optional_controlled_simulation_reference
-    merge_policy: optional_only
+      - controlled_simulation_reference
+      - throughput_delay_jitter_reference
+      - scheduler_load_sensitivity_check
+    merge_policy: controlled_reference_only
