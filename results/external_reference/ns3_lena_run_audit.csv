@@ -1,0 +1,13 @@
+source_dataset,run_id,traffic_condition,scheduler_mode,seed,ns3_example,curated_csv_file_count,parsed_reference_row_count,output_status,parser_status,notes
+ns3_lena,medium_load_ofdma_seed_1,medium_load,ofdma,1,cttc-nr-simple-qos-sched,13,1,parsed,ok,Parsed simulator summary is available.
+ns3_lena,medium_load_ofdma_seed_2,medium_load,ofdma,2,cttc-nr-simple-qos-sched,13,1,parsed,ok,Parsed simulator summary is available.
+ns3_lena,medium_load_ofdma_seed_3,medium_load,ofdma,3,cttc-nr-simple-qos-sched,13,1,parsed,ok,Parsed simulator summary is available.
+ns3_lena,medium_load_tdma_seed_1,medium_load,tdma,1,cttc-nr-simple-qos-sched,13,1,parsed,ok,Parsed simulator summary is available.
+ns3_lena,medium_load_tdma_seed_2,medium_load,tdma,2,cttc-nr-simple-qos-sched,13,1,parsed,ok,Parsed simulator summary is available.
+ns3_lena,medium_load_tdma_seed_3,medium_load,tdma,3,cttc-nr-simple-qos-sched,13,1,parsed,ok,Parsed simulator summary is available.
+ns3_lena,saturation_load_ofdma_seed_1,saturation_load,ofdma,1,cttc-nr-simple-qos-sched,13,1,parsed,ok,Parsed simulator summary is available.
+ns3_lena,saturation_load_ofdma_seed_2,saturation_load,ofdma,2,cttc-nr-simple-qos-sched,13,1,parsed,ok,Parsed simulator summary is available.
+ns3_lena,saturation_load_ofdma_seed_3,saturation_load,ofdma,3,cttc-nr-simple-qos-sched,13,1,parsed,ok,Parsed simulator summary is available.
+ns3_lena,saturation_load_tdma_seed_1,saturation_load,tdma,1,cttc-nr-simple-qos-sched,13,1,parsed,ok,Parsed simulator summary is available.
+ns3_lena,saturation_load_tdma_seed_2,saturation_load,tdma,2,cttc-nr-simple-qos-sched,13,1,parsed,ok,Parsed simulator summary is available.
+ns3_lena,saturation_load_tdma_seed_3,saturation_load,tdma,3,cttc-nr-simple-qos-sched,13,1,parsed,ok,Parsed simulator summary is available.

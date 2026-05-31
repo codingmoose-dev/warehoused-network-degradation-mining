@@ -1,0 +1,2 @@
+run_id,traffic_condition,scheduler_mode,seed,ns3_example,ns3_version,tx_packets,rx_packets,tx_bytes,rx_bytes,offered_traffic_mbps,mean_throughput_mbps,mean_delay_ms,mean_jitter_ms,packet_delivery_ratio,packet_loss_fraction,output_status,parser_status,notes
+medium_load_ofdma_seed_1,medium_load,ofdma,1,cttc-nr-simple-qos-sched,,1200,946,2584800,1822680,34.464,12.1512,68.204248,0.34581049999999997,0.7883333333333333,0.21166666666666667,parsed,ok,Controlled 5G-LENA QoS scheduler run summarized from ns-3 flow monitor output.

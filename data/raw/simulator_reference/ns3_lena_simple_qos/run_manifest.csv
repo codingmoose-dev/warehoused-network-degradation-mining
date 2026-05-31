@@ -1,0 +1,13 @@
+run_id,traffic_condition,scheduler_mode,seed,ns3_example,output_dir_label,output_status,notes
+medium_load_ofdma_seed_1,medium_load,ofdma,1,cttc-nr-simple-qos-sched,ns3_lena_simple_qos/medium_load_ofdma_seed_1,parsed,Controlled 5G-LENA reference run.
+medium_load_ofdma_seed_2,medium_load,ofdma,2,cttc-nr-simple-qos-sched,ns3_lena_simple_qos/medium_load_ofdma_seed_2,parsed,Controlled 5G-LENA reference run.
+medium_load_ofdma_seed_3,medium_load,ofdma,3,cttc-nr-simple-qos-sched,ns3_lena_simple_qos/medium_load_ofdma_seed_3,parsed,Controlled 5G-LENA reference run.
+medium_load_tdma_seed_1,medium_load,tdma,1,cttc-nr-simple-qos-sched,ns3_lena_simple_qos/medium_load_tdma_seed_1,parsed,Controlled 5G-LENA reference run.
+medium_load_tdma_seed_2,medium_load,tdma,2,cttc-nr-simple-qos-sched,ns3_lena_simple_qos/medium_load_tdma_seed_2,parsed,Controlled 5G-LENA reference run.
+medium_load_tdma_seed_3,medium_load,tdma,3,cttc-nr-simple-qos-sched,ns3_lena_simple_qos/medium_load_tdma_seed_3,parsed,Controlled 5G-LENA reference run.
+saturation_load_ofdma_seed_1,saturation_load,ofdma,1,cttc-nr-simple-qos-sched,ns3_lena_simple_qos/saturation_load_ofdma_seed_1,parsed,Controlled 5G-LENA reference run.
+saturation_load_ofdma_seed_2,saturation_load,ofdma,2,cttc-nr-simple-qos-sched,ns3_lena_simple_qos/saturation_load_ofdma_seed_2,parsed,Controlled 5G-LENA reference run.
+saturation_load_ofdma_seed_3,saturation_load,ofdma,3,cttc-nr-simple-qos-sched,ns3_lena_simple_qos/saturation_load_ofdma_seed_3,parsed,Controlled 5G-LENA reference run.
+saturation_load_tdma_seed_1,saturation_load,tdma,1,cttc-nr-simple-qos-sched,ns3_lena_simple_qos/saturation_load_tdma_seed_1,parsed,Controlled 5G-LENA reference run.
+saturation_load_tdma_seed_2,saturation_load,tdma,2,cttc-nr-simple-qos-sched,ns3_lena_simple_qos/saturation_load_tdma_seed_2,parsed,Controlled 5G-LENA reference run.
+saturation_load_tdma_seed_3,saturation_load,tdma,3,cttc-nr-simple-qos-sched,ns3_lena_simple_qos/saturation_load_tdma_seed_3,parsed,Controlled 5G-LENA reference run.

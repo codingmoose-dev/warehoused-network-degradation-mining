@@ -1,0 +1,41 @@
+source_dataset,audit_section,check_name,column_name,group_name,group_value,row_count,non_missing_count,missing_fraction,min,q25,median,q75,max,affected_count,affected_fraction,status,notes
+ucc_5g_context,dataset,row_count,,,,188711,188711,0.0,,,,,,188711,1.0,ok,Prepared UCC reference row count.
+ucc_5g_context,unit_handling,bitrate_unit_policy,"download_bitrate_raw,upload_bitrate_raw,download_throughput_mbps,upload_throughput_mbps",,,188711,188711,,,,,,,188711,1.0,ok,UCC DL_bitrate and UL_bitrate are documented as kbps; raw bitrate values are retained and throughput_mbps fields are derived by dividing by 1000.
+ucc_5g_context,unit_handling,packet_loss_unit_policy,packet_loss_fraction,,,188711,3272,0.9826613181001638,,,,,,0,0.0,ok,PINGLOSS is converted to a fraction when source values are percent-like.
+ucc_5g_context,distribution,category_count,application_context,application_context,Netflix,188711,188711,0.0,,,,,,72832,0.38594464551615965,ok,Observed UCC context distribution.
+ucc_5g_context,distribution,category_count,application_context,application_context,Amazon_Prime,188711,188711,0.0,,,,,,72671,0.38509148910238405,ok,Observed UCC context distribution.
+ucc_5g_context,distribution,category_count,application_context,application_context,Download,188711,188711,0.0,,,,,,43208,0.2289638653814563,ok,Observed UCC context distribution.
+ucc_5g_context,distribution,category_count,mobility_context,mobility_context,Driving,188711,188711,0.0,,,,,,103545,0.5486961544372082,ok,Observed UCC context distribution.
+ucc_5g_context,distribution,category_count,mobility_context,mobility_context,Static,188711,188711,0.0,,,,,,85166,0.4513038455627918,ok,Observed UCC context distribution.
+ucc_5g_context,distribution,category_count,technology,technology,5g,188711,188711,0.0,,,,,,136403,0.7228142503616641,ok,Observed UCC context distribution.
+ucc_5g_context,distribution,category_count,technology,technology,lte,188711,188711,0.0,,,,,,35212,0.18659219653332343,ok,Observed UCC context distribution.
+ucc_5g_context,distribution,category_count,technology,technology,3g,188711,188711,0.0,,,,,,16372,0.08675699879710244,ok,Observed UCC context distribution.
+ucc_5g_context,distribution,category_count,technology,technology,unknown,188711,188711,0.0,,,,,,633,0.003354335465341183,ok,Observed UCC context distribution.
+ucc_5g_context,distribution,category_count,technology,technology,2g,188711,188711,0.0,,,,,,91,0.0004822188425687957,ok,Observed UCC context distribution.
+ucc_5g_context,distribution,category_count,network_mode,network_mode,5G,188711,188711,0.0,,,,,,136403,0.7228142503616641,ok,Observed UCC context distribution.
+ucc_5g_context,distribution,category_count,network_mode,network_mode,LTE,188711,188711,0.0,,,,,,35212,0.18659219653332343,ok,Observed UCC context distribution.
+ucc_5g_context,distribution,category_count,network_mode,network_mode,HSPA+,188711,188711,0.0,,,,,,15880,0.0841498375823349,ok,Observed UCC context distribution.
+ucc_5g_context,distribution,category_count,network_mode,network_mode,UMTS,188711,188711,0.0,,,,,,492,0.0026071612147675546,ok,Observed UCC context distribution.
+ucc_5g_context,distribution,category_count,network_mode,network_mode,HSUPA,188711,188711,0.0,,,,,,470,0.002490580835245428,ok,Observed UCC context distribution.
+ucc_5g_context,distribution,category_count,network_mode,network_mode,HSDPA,188711,188711,0.0,,,,,,163,0.0008637546300957549,ok,Observed UCC context distribution.
+ucc_5g_context,distribution,category_count,network_mode,network_mode,GPRS,188711,188711,0.0,,,,,,78,0.00041333043648753915,ok,Observed UCC context distribution.
+ucc_5g_context,distribution,category_count,network_mode,network_mode,EDGE,188711,188711,0.0,,,,,,13,6.888840608125652e-05,ok,Observed UCC context distribution.
+ucc_5g_context,distribution,category_count,scenario,scenario,Season3-StrangerThings,188711,188711,0.0,,,,,,48947,0.259375447112251,ok,Observed UCC context distribution.
+ucc_5g_context,distribution,category_count,scenario,scenario,Season3-TheExpanse,188711,188711,0.0,,,,,,47352,0.2509233695968968,ok,Observed UCC context distribution.
+ucc_5g_context,distribution,category_count,scenario,scenario,<missing>,188711,188711,0.0,,,,,,43208,0.2289638653814563,ok,Observed UCC context distribution.
+ucc_5g_context,distribution,category_count,scenario,scenario,animated-RickandMorty,188711,188711,0.0,,,,,,23885,0.12656919840390862,ok,Observed UCC context distribution.
+ucc_5g_context,distribution,category_count,scenario,scenario,animated-AdventureTime,188711,188711,0.0,,,,,,13385,0.07092856272289373,ok,Observed UCC context distribution.
+ucc_5g_context,distribution,category_count,scenario,scenario,animated-Ninjago,188711,188711,0.0,,,,,,11934,0.06323955678259349,ok,Observed UCC context distribution.
+ucc_5g_context,numeric_quality,numeric_range,rsrp_dbm,,,188711,188711,0.0,-200.0,-100.0,-93.0,-81.0,-48.0,73,0.00038683489568705585,review,"Values outside the configured review range: lower=-156.0, upper=-20.0."
+ucc_5g_context,numeric_quality,numeric_range,rsrq_db,,,188711,185077,0.019256959053791246,-26.0,-14.0,-12.0,-10.0,7.0,10,5.4031565240413447e-05,review,"Values outside the configured review range: lower=-50.0, upper=0.0."
+ucc_5g_context,numeric_quality,numeric_range,rssi_dbm,,,188711,135138,0.28388912146085815,-113.0,-88.0,-78.0,-69.0,-31.0,0,0.0,ok,Numeric range check completed.
+ucc_5g_context,numeric_quality,numeric_range,sinr_db,,,188711,171615,0.09059355310501242,-30.0,-1.0,2.0,7.0,35.0,0,0.0,ok,Numeric range check completed.
+ucc_5g_context,numeric_quality,numeric_range,cqi,,,188711,171614,0.09059885221317253,0.0,9.0,11.0,14.0,15.0,0,0.0,ok,Numeric range check completed.
+ucc_5g_context,numeric_quality,numeric_range,latency_ms,,,188711,3208,0.9830004610224099,64.0,69.0,75.0,84.0,889.0,0,0.0,review,Ping average is context-limited and is mostly populated for download traces.
+ucc_5g_context,numeric_quality,numeric_range,jitter_ms,,,188711,3208,0.9830004610224099,0.0,1.0,3.0,5.0,255.0,0,0.0,review,Ping standard deviation is context-limited and is mostly populated for download traces.
+ucc_5g_context,numeric_quality,numeric_range,packet_loss_fraction,,,188711,3272,0.9826613181001638,0.0,0.0,0.0,0.0,1.0,0,0.0,review,Prepared value is stored as a fraction; percent-like source values are converted during UCC preparation.
+ucc_5g_context,numeric_quality,numeric_range,speed_raw,,,188711,188711,0.0,0.0,0.0,8.0,34.0,105.0,0,0.0,ok,Numeric range check completed.
+ucc_5g_context,numeric_quality,numeric_range,download_bitrate_raw,,,188711,188711,0.0,0.0,0.0,2.0,4480.0,532905.0,0,0.0,ok,Source bitrate is retained in kbps as reported by the UCC source documentation.
+ucc_5g_context,numeric_quality,numeric_range,upload_bitrate_raw,,,188711,188711,0.0,0.0,0.0,4.0,55.0,6862.0,0,0.0,ok,Source bitrate is retained in kbps as reported by the UCC source documentation.
+ucc_5g_context,numeric_quality,numeric_range,download_throughput_mbps,,,188711,188711,0.0,0.0,0.0,0.002,4.48,532.905,0,0.0,ok,Derived from UCC DL_bitrate by converting kbps to Mbps.
+ucc_5g_context,numeric_quality,numeric_range,upload_throughput_mbps,,,188711,188711,0.0,0.0,0.0,0.004,0.055,6.862,0,0.0,ok,Derived from UCC UL_bitrate by converting kbps to Mbps.

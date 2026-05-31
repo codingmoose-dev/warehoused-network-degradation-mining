@@ -1,0 +1,11 @@
+source_dataset,check_name,check_value,status
+ns3_lena,simulator_reference_dir_exists,True,ok
+ns3_lena,raw_text_file_count,24,ok
+ns3_lena,curated_csv_file_count,13,ok
+ns3_lena,readiness_status,ready_for_parser,ok
+ns3_lena,local_ns3_root_configured,True,ok
+ns3_lena,local_ns3_root_exists,True,ok
+ns3_lena,local_ns3_launcher_present,True,ok
+ns3_lena,local_nr_module_present,True,ok
+ns3_lena,candidate_qos_example_present,True,ok
+ns3_lena,local_nr_example_file_count,13,ok
