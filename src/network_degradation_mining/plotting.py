@@ -568,24 +568,24 @@ def build_warehouse_interaction_matrix_table(
     for record in crosstabs.to_dict("records"):
         row_group = str(record["row_group"])
         column_group = str(record["column_group"])
-    interaction_label = (
-        f"{display_field_name(row_group)} × {display_field_name(column_group)}"
-    )
+        interaction_label = (
+            f"{display_field_name(row_group)} × {display_field_name(column_group)}"
+        )
 
-    rows.append(
-        {
-            "interaction_name": INTERACTION_PAIR_LABELS.get(
-                (row_group, column_group),
-                interaction_label,
-            ),
-            "row_group": row_group,
-            "column_group": column_group,
-            "row_label": display_value(record["row_value"]),
-            "column_label": display_value(record["column_value"]),
-            "row_count": int(record.get("row_count", 0)),
-            "degraded_count": int(record.get("degraded_count", 0)),
-            "degradation_rate": float(record.get("degradation_rate", 0.0)),
-        }
-    )
+        rows.append(
+            {
+                "interaction_name": INTERACTION_PAIR_LABELS.get(
+                    (row_group, column_group),
+                    interaction_label,
+                ),
+                "row_group": row_group,
+                "column_group": column_group,
+                "row_label": display_value(record["row_value"]),
+                "column_label": display_value(record["column_value"]),
+                "row_count": int(record.get("row_count", 0)),
+                "degraded_count": int(record.get("degraded_count", 0)),
+                "degradation_rate": float(record.get("degradation_rate", 0.0)),
+            }
+        )
 
     return pd.DataFrame(rows)
