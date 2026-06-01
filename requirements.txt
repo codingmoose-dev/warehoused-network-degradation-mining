@@ -2,3 +2,5 @@ pandas
 pyyaml
 pyarrow
 matplotlib
+scikit-learn
+xgboost
