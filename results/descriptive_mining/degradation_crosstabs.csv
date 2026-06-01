@@ -1,0 +1,49 @@
+row_group,column_group,row_value,column_value,row_count,degraded_count,degradation_rate
+app_type,congestion_level,Browse,High,4832,3015,0.6239652317880795
+app_type,congestion_level,Browse,Low,2226,621,0.27897574123989216
+app_type,congestion_level,Browse,Medium,5374,2055,0.3823967249720878
+app_type,congestion_level,Call,High,4788,2756,0.5756056808688388
+app_type,congestion_level,Call,Low,2204,335,0.15199637023593465
+app_type,congestion_level,Call,Medium,5381,1638,0.30440438580189555
+app_type,congestion_level,Gaming,High,4800,3286,0.6845833333333333
+app_type,congestion_level,Gaming,Low,2327,858,0.3687150837988827
+app_type,congestion_level,Gaming,Medium,5442,2493,0.45810363836824697
+app_type,congestion_level,Streaming,High,4784,3911,0.8175167224080268
+app_type,congestion_level,Streaming,Low,2365,1137,0.4807610993657505
+app_type,congestion_level,Streaming,Medium,5477,3253,0.5939382873836042
+band,congestion_level,LTE_Anchor,High,4711,4083,0.8666949692209722
+band,congestion_level,LTE_Anchor,Low,2288,1067,0.46634615384615385
+band,congestion_level,LTE_Anchor,Medium,5391,3408,0.6321647189760712
+band,congestion_level,n257,High,257,216,0.8404669260700389
+band,congestion_level,n257,Low,102,49,0.4803921568627451
+band,congestion_level,n257,Medium,311,160,0.5144694533762058
+band,congestion_level,n258,High,1282,1048,0.8174726989079563
+band,congestion_level,n258,Low,542,221,0.4077490774907749
+band,congestion_level,n258,Medium,1336,724,0.5419161676646707
+band,congestion_level,n260,High,1547,1214,0.7847446670976083
+band,congestion_level,n260,Low,791,339,0.42857142857142855
+band,congestion_level,n260,Medium,1762,1000,0.5675368898978433
+band,congestion_level,n28,High,2848,1043,0.36622191011235955
+band,congestion_level,n28,Low,1295,107,0.08262548262548262
+band,congestion_level,n28,Medium,3277,501,0.15288373512358866
+band,congestion_level,n41,High,828,452,0.5458937198067633
+band,congestion_level,n41,Low,387,78,0.20155038759689922
+band,congestion_level,n41,Medium,875,268,0.3062857142857143
+band,congestion_level,n77,High,1581,1089,0.6888045540796964
+band,congestion_level,n77,Low,743,221,0.297442799461642
+band,congestion_level,n77,Medium,1736,665,0.38306451612903225
+band,congestion_level,n78,High,5911,3669,0.6207071561495516
+band,congestion_level,n78,Low,2853,826,0.2895198037153873
+band,congestion_level,n78,Medium,6696,2587,0.3863500597371565
+band,congestion_level,n79,High,239,154,0.6443514644351465
+band,congestion_level,n79,Low,121,43,0.35537190082644626
+band,congestion_level,n79,Medium,290,126,0.43448275862068964
+network_type,movement_speed,4G,Driving,462,361,0.7813852813852814
+network_type,movement_speed,4G,Static,6201,4003,0.6455410417674569
+network_type,movement_speed,4G,Walking,5727,4194,0.7323205866946045
+network_type,movement_speed,5G NSA,Driving,765,477,0.6235294117647059
+network_type,movement_speed,5G NSA,Static,9998,4539,0.45399079815963195
+network_type,movement_speed,5G NSA,Walking,8887,4873,0.5483290199167323
+network_type,movement_speed,5G SA,Driving,763,357,0.46788990825688076
+network_type,movement_speed,5G SA,Static,9037,3115,0.3446940356312936
+network_type,movement_speed,5G SA,Walking,8160,3439,0.42144607843137255

@@ -1,0 +1,2 @@
+interaction_name,row_group,column_group,row_label,column_label,row_count,degraded_count,degradation_rate
+Network Type × Mobility State,network_type,movement_speed,5G SA,Walking,8160,3439,0.42144607843137255

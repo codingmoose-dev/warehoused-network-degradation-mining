@@ -1,0 +1,5 @@
+metric,value
+row_count,50000.0
+service_degraded_count,25358.0
+service_degraded_fraction,0.50716
+session_count,5000.0

@@ -1,0 +1,24 @@
+group_name,group_label,group_value,display_label,row_count,degraded_count,degradation_rate
+congestion_level,Congestion Level,Low,Congestion Level: Low,9122,2951,0.32350361762771324
+app_type,Application Type,Call,Application Type: Call,12373,4729,0.38220318435302675
+network_type,Network Type,5G SA,Network Type: 5G SA,17960,6911,0.3847995545657016
+congestion_level,Congestion Level,Medium,Congestion Level: Medium,21674,9439,0.4354987542677863
+time_of_day_bin,Time of Day,night,Time of Day: Night,12616,5568,0.4413443246670894
+app_type,Application Type,Browse,Application Type: Browsing,12432,5691,0.4577702702702703
+movement_speed,Mobility State,Static,Mobility State: Static,25236,11657,0.46191948010778255
+band,Radio Band,n79,Radio Band: N79,650,323,0.4969230769230769
+network_type,Network Type,5G NSA,Network Type: 5G NSA,19650,9889,0.5032569974554707
+area_type,Area Type,Urban,Area Type: Urban,50000,25358,0.50716
+time_of_day_bin,Time of Day,afternoon,Time of Day: Afternoon,12478,6349,0.5088155153069402
+app_type,Application Type,Gaming,Application Type: Gaming,12569,6637,0.5280451905481741
+time_of_day_bin,Time of Day,evening,Time of Day: Evening,12152,6550,0.5390059249506254
+time_of_day_bin,Time of Day,morning,Time of Day: Morning,12754,6891,0.5403010820134859
+movement_speed,Mobility State,Walking,Mobility State: Walking,22774,12506,0.5491349784842364
+movement_speed,Mobility State,Driving,Mobility State: Driving,1990,1195,0.6005025125628141
+band,Radio Band,n260,Radio Band: N260,4100,2553,0.6226829268292683
+band,Radio Band,n258,Radio Band: N258,3160,1993,0.6306962025316456
+band,Radio Band,n257,Radio Band: N257,670,425,0.6343283582089553
+app_type,Application Type,Streaming,Application Type: Streaming,12626,8301,0.6574528750198004
+congestion_level,Congestion Level,High,Congestion Level: High,19204,12968,0.6752759841699646
+band,Radio Band,LTE_Anchor,Radio Band: LTE Anchor,12390,8558,0.6907183212267958
+network_type,Network Type,4G,Network Type: 4G,12390,8558,0.6907183212267958

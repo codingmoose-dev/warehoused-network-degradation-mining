@@ -1,0 +1,4 @@
+congestion_level,row_count,degraded_count,degradation_rate
+High,19204,12968,0.6752759841699646
+Medium,21674,9439,0.4354987542677863
+Low,9122,2951,0.32350361762771324

@@ -1,0 +1,4 @@
+movement_speed,row_count,degraded_count,degradation_rate
+Driving,1990,1195,0.6005025125628141
+Walking,22774,12506,0.5491349784842364
+Static,25236,11657,0.46191948010778255
