@@ -4,3 +4,5 @@ high_latency,50000,17688,0.35376,ok
 high_jitter,50000,1459,0.02918,ok
 downlink_service_shortfall,50000,20760,0.4152,ok
 poor_video_quality,50000,3952,0.07904,ok
+dropped_connection,50000,960,0.0192,ok
+anomalous,50000,294,0.00588,ok

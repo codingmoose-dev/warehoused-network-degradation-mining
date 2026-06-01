@@ -421,6 +421,8 @@ def build_label_audit(supervised: pd.DataFrame) -> pd.DataFrame:
         "high_jitter",
         "downlink_service_shortfall",
         "poor_video_quality",
+        "dropped_connection",
+        "anomalous",
     ]:
         if column not in supervised.columns:
             continue
@@ -454,7 +456,7 @@ def build_mining_feature_tables(
     supervised = build_supervised_degradation_table(joined)
     clustering = build_clustering_feature_table(joined)
     transactions = build_association_transaction_table(joined)
-    label_audit = build_label_audit(supervised)
+    label_audit = build_label_audit(add_degradation_labels(joined))
 
     paths = {
         "supervised_degradation_table": output_dir / "supervised_degradation_table.csv",
