@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Any
 
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 
 MODEL_COMPARISON_BLUE = "#1f77b4"
@@ -22,6 +23,13 @@ FIELD_DISPLAY_NAMES = {
     "area_type": "Area Type",
     "video_quality_label": "Video Quality",
     "service_degraded": "Service Degraded",
+    "signal_strength_unclipped_dbm": "Unclipped Signal Strength (dBm)",
+    "signal_strength_dbm": "Signal Strength (dBm)",
+    "data_usage_mb": "Data Usage (MB)",
+    "link_capacity_downlink_mbps": "Downlink Capacity (Mbps)",
+    "link_capacity_upload_mbps": "Uplink Capacity (Mbps)",
+    "offered_downlink_mbps": "Offered Downlink (Mbps)",
+    "offered_upload_mbps": "Offered Uplink (Mbps)",
 }
 
 MODEL_DISPLAY_NAMES = {
@@ -89,6 +97,14 @@ VALUE_DISPLAY_NAMES = {
     "Rural": "Rural",
     "<missing>": "Missing",
 }
+
+DECISION_PATH_RULE_FILL = "white"
+DECISION_PATH_DEGRADED_FILL = "#D9D9D9"
+DECISION_PATH_NOT_DEGRADED_FILL = "#1F1F1F"
+DECISION_PATH_EDGE = "#111111"
+DECISION_PATH_DARK_TEXT = "0.05"
+DECISION_PATH_LIGHT_TEXT = "white"
+
 
 
 def ensure_figure_parent(path: str | Path) -> Path:
@@ -589,3 +605,382 @@ def build_warehouse_interaction_matrix_table(
         )
 
     return pd.DataFrame(rows)
+
+
+
+def _wrap_decision_rule_label(text: Any, width: int = 68) -> str:
+    wrapped_lines: list[str] = []
+    for line in str(text).splitlines():
+        clean_line = line.strip()
+        if not clean_line:
+            continue
+        wrapped_lines.extend(
+            textwrap.wrap(clean_line, width=width, break_long_words=False)
+        )
+    return "\n".join(wrapped_lines)
+
+
+def _select_representative_decision_rules(
+    leaf_rules: pd.DataFrame,
+    feature_context: str = "reduced_context",
+    criterion: str = "gini",
+    per_class: int = 3,
+) -> pd.DataFrame:
+    required_columns = {
+        "feature_context",
+        "criterion",
+        "predicted_class",
+        "degraded_rate_in_leaf",
+        "node_sample_count",
+    }
+    missing_columns = required_columns.difference(leaf_rules.columns)
+    if missing_columns:
+        raise ValueError(
+            "Missing decision-rule columns: "
+            + ", ".join(sorted(missing_columns))
+        )
+
+    rules = leaf_rules[
+        (leaf_rules["feature_context"] == feature_context)
+        & (leaf_rules["criterion"] == criterion)
+    ].copy()
+
+    if rules.empty:
+        raise ValueError(
+            f"No rules found for feature_context={feature_context}, "
+            f"criterion={criterion}."
+        )
+
+    rules["predicted_class"] = rules["predicted_class"].astype(int)
+    rules["degraded_rate_in_leaf"] = pd.to_numeric(
+        rules["degraded_rate_in_leaf"], errors="coerce"
+    ).fillna(0.0)
+    rules["node_sample_count"] = pd.to_numeric(
+        rules["node_sample_count"], errors="coerce"
+    ).fillna(0.0)
+
+    rules["class_label"] = np.where(
+        rules["predicted_class"].eq(1),
+        "Degraded",
+        "Not degraded",
+    )
+    rules["class_confidence"] = np.where(
+        rules["predicted_class"].eq(1),
+        rules["degraded_rate_in_leaf"],
+        1.0 - rules["degraded_rate_in_leaf"],
+    )
+    rules["selection_score"] = rules["class_confidence"] * np.log1p(
+        rules["node_sample_count"]
+    )
+
+    selected_frames: list[pd.DataFrame] = []
+    for class_value in [1, 0]:
+        class_rules = rules[rules["predicted_class"].eq(class_value)]
+        class_rules = class_rules.sort_values(
+            ["selection_score", "class_confidence", "node_sample_count"],
+            ascending=[False, False, False],
+        ).head(per_class)
+        selected_frames.append(class_rules)
+
+    selected = pd.concat(selected_frames, ignore_index=True)
+    return selected.sort_values(
+        ["predicted_class", "selection_score"],
+        ascending=[False, False],
+    ).reset_index(drop=True)
+
+
+def plot_representative_decision_paths(
+    leaf_rules: pd.DataFrame,
+    path: str | Path,
+    feature_context: str = "reduced_context",
+    criterion: str = "gini",
+    per_class: int = 3,
+) -> Path:
+    selected = _select_representative_decision_rules(
+        leaf_rules=leaf_rules,
+        feature_context=feature_context,
+        criterion=criterion,
+        per_class=per_class,
+    )
+
+    output_path = ensure_figure_parent(path)
+    edge_color = "#111111"
+    text_color = "#111111"
+    box_fill = "white"
+    separator_color = "0.35"
+
+    row_count = len(selected)
+    box_height = 0.68
+    figure_height = max(4.0, 1.22 * row_count + 0.8)
+    fig, ax = plt.subplots(figsize=(10.4, figure_height))
+    ax.set_xlim(0.0, 0.83)
+    ax.set_ylim(0.0, float(row_count))
+    ax.axis("off")
+
+    row_positions: list[tuple[int, float, float]] = []
+
+    for row_index, (_, row) in enumerate(selected.iterrows()):
+        y_position = row_count - row_index - 0.82
+        predicted_class = int(row["predicted_class"])
+        state_label = "Degraded" if predicted_class == 1 else "Not degraded"
+        row_positions.append((predicted_class, y_position, box_height))
+
+        rule_column = "rule_text_interpretable"
+        if rule_column not in row.index or pd.isna(row.get(rule_column)):
+            rule_column = "rule_text"
+
+        rule_text = str(row.get(rule_column, "")).replace(" AND ", "\n")
+        rule_text = _wrap_decision_rule_label(rule_text, width=46)
+
+        rule_x = 0.03
+        rule_y = y_position
+        rule_w = 0.51
+        rule_h = box_height
+
+        ax.add_patch(
+            plt.Rectangle(
+                (rule_x, rule_y),
+                rule_w,
+                rule_h,
+                linewidth=1.0,
+                edgecolor=edge_color,
+                facecolor=box_fill,
+                zorder=1,
+            )
+        )
+
+        ax.text(
+            rule_x + 0.02,
+            rule_y + rule_h / 2.0,
+            rule_text,
+            ha="left",
+            va="center",
+            fontsize=9.0,
+            color=text_color,
+            linespacing=1.18,
+            zorder=2,
+        )
+
+        ax.annotate(
+            "",
+            xy=(0.62, y_position + rule_h / 2.0),
+            xytext=(0.55, y_position + rule_h / 2.0),
+            arrowprops={
+                "arrowstyle": "-|>",
+                "linewidth": 1.0,
+                "color": edge_color,
+                "mutation_scale": 12,
+            },
+        )
+
+        leaf_x = 0.63
+        leaf_y = y_position
+        leaf_w = 0.17
+        leaf_h = box_height
+
+        ax.add_patch(
+            plt.Rectangle(
+                (leaf_x, leaf_y),
+                leaf_w,
+                leaf_h,
+                linewidth=1.0,
+                edgecolor=edge_color,
+                facecolor=box_fill,
+                zorder=1,
+            )
+        )
+
+        class_confidence = float(row["class_confidence"])
+        leaf_samples = int(float(row["node_sample_count"]))
+        leaf_label = (
+            f"{state_label}\n"
+            f"Confidence = {class_confidence:.3f}\n"
+            f"Leaf n = {leaf_samples:,}"
+        )
+
+        ax.text(
+            leaf_x + leaf_w / 2.0,
+            leaf_y + leaf_h / 2.0,
+            leaf_label,
+            ha="center",
+            va="center",
+            fontsize=9.3,
+            color=text_color,
+            linespacing=1.22,
+            zorder=3,
+        )
+
+    for index in range(1, len(row_positions)):
+        previous_class, previous_y, _ = row_positions[index - 1]
+        current_class, current_y, current_h = row_positions[index]
+        if previous_class != current_class:
+            separator_y = (previous_y + current_y + current_h) / 2.0
+            ax.hlines(
+                y=separator_y,
+                xmin=0.03,
+                xmax=0.80,
+                colors=separator_color,
+                linewidth=0.9,
+                linestyles=(0, (4, 4)),
+                zorder=0,
+            )
+            break
+
+    output_path = save_figure(fig, output_path)
+    plt.close(fig)
+    return output_path
+
+def plot_pruned_decision_tree(
+    model: Any,
+    feature_names: list[str],
+    path: str | Path,
+) -> Path:
+    from sklearn.tree import plot_tree as sklearn_plot_tree
+
+    figure_width = max(12.0, min(26.0, 2.4 * max(model.get_depth(), 4)))
+    fig, ax = plt.subplots(figsize=(figure_width, 9.0))
+    sklearn_plot_tree(
+        model,
+        feature_names=feature_names,
+        class_names=["not_degraded", "degraded"],
+        filled=False,
+        impurity=True,
+        proportion=True,
+        rounded=False,
+        max_depth=3,
+        fontsize=7,
+        ax=ax,
+    )
+    ax.set_axis_off()
+    output_path = save_figure(fig, path)
+    plt.close(fig)
+    return output_path
+
+
+def plot_clustering_elbow_curve(validation: pd.DataFrame, path: str | Path) -> Path:
+    data = validation[
+        (validation["method"] == "kmeans") & validation["inertia"].notna()
+    ].copy()
+    fig, ax = plt.subplots(figsize=(7.0, 4.5))
+    if not data.empty:
+        ax.plot(data["k"], data["inertia"], marker="o")
+    ax.set_xlabel("K")
+    ax.set_ylabel("Inertia")
+    ax.grid(True, linewidth=0.4, alpha=0.5)
+    output_path = save_figure(fig, path)
+    plt.close(fig)
+    return output_path
+
+
+def plot_clustering_silhouette_scores(
+    validation: pd.DataFrame, path: str | Path
+) -> Path:
+    data = validation[validation["silhouette_score"].notna()].copy()
+    fig, ax = plt.subplots(figsize=(8.0, 4.8))
+    for method, group in data.groupby("method"):
+        if group["k"].notna().any():
+            ordered = group.sort_values("k")
+            ax.plot(ordered["k"], ordered["silhouette_score"], marker="o", label=method)
+    ax.set_xlabel("K")
+    ax.set_ylabel("Silhouette score")
+    if not data.empty:
+        ax.legend(frameon=False)
+    ax.grid(True, linewidth=0.4, alpha=0.5)
+    output_path = save_figure(fig, path)
+    plt.close(fig)
+    return output_path
+
+
+def plot_cluster_profiles(profile: pd.DataFrame, path: str | Path) -> Path:
+    required = {"method", "cluster_label", "row_count", "service_degraded_mean"}
+    fig, ax = plt.subplots(figsize=(8.0, 5.0))
+
+    if required.issubset(profile.columns):
+        data = profile[profile["method"] == "kmeans"].copy()
+        data = data.sort_values("service_degraded_mean", ascending=True)
+        labels = [f"C{int(value)}" for value in data["cluster_label"]]
+        ax.barh(labels, data["service_degraded_mean"])
+        ax.set_xlabel("Mean degradation label")
+        ax.set_ylabel("KMeans cluster")
+        for index, row in enumerate(data.to_dict("records")):
+            ax.text(
+                float(row["service_degraded_mean"]),
+                index,
+                f" n={int(row['row_count'])}",
+                va="center",
+                fontsize=8,
+            )
+
+    ax.grid(True, axis="x", linewidth=0.4, alpha=0.5)
+    output_path = save_figure(fig, path)
+    plt.close(fig)
+    return output_path
+
+
+def plot_top_association_rules(
+    degradation_rules: pd.DataFrame,
+    path: str | Path,
+    top_n: int = 20,
+) -> Path:
+    fig, ax = plt.subplots(figsize=(9.0, 7.0))
+
+    if not degradation_rules.empty:
+        data = degradation_rules.sort_values(
+            ["lift", "confidence", "support"],
+            ascending=[False, False, False],
+        ).head(top_n)
+        data = data.sort_values("lift", ascending=True)
+
+        labels = [
+            text.replace(";", "\n")
+            for text in data["antecedent_text"].astype(str).tolist()
+        ]
+        ax.barh(labels, data["lift"])
+        ax.set_xlabel("Lift")
+        ax.set_ylabel("Antecedent itemset")
+
+    ax.grid(True, axis="x", linewidth=0.4, alpha=0.5)
+    output_path = save_figure(fig, path)
+    plt.close(fig)
+    return output_path
+
+
+def plot_external_metric_distribution(
+    plot_frame: pd.DataFrame,
+    x_label: str,
+    path: str | Path,
+) -> Path | None:
+    required = {"source_dataset", "value"}
+    if not required.issubset(plot_frame.columns) or plot_frame.empty:
+        return None
+
+    working = plot_frame.copy()
+    working["value"] = pd.to_numeric(working["value"], errors="coerce")
+    working = working.dropna(subset=["source_dataset", "value"])
+    if working["source_dataset"].nunique(dropna=True) < 2:
+        return None
+
+    ordered_sources = (
+        working.groupby("source_dataset")["value"]
+        .median()
+        .sort_values()
+        .index.tolist()
+    )
+    data = [
+        working.loc[working["source_dataset"] == source, "value"].to_numpy()
+        for source in ordered_sources
+    ]
+
+    fig, ax = plt.subplots(figsize=(8.0, 5.0))
+    try:
+        ax.boxplot(data, tick_labels=ordered_sources, showfliers=False)
+    except TypeError:
+        ax.boxplot(data, labels=ordered_sources, showfliers=False)
+    ax.set_xlabel("Dataset")
+    ax.set_ylabel(x_label)
+    ax.tick_params(axis="x", rotation=25)
+    ax.grid(True, axis="y", linewidth=0.4, alpha=0.5)
+    output_path = save_figure(fig, path)
+    plt.close(fig)
+    return output_path
+
