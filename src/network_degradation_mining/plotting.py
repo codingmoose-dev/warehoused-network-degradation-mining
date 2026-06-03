@@ -906,6 +906,21 @@ CLUSTER_PROJECTION_STATUS_COLORS = {
     "Unavailable": "0.55",
 }
 
+CLUSTER_PROJECTION_CLUSTER_MARKERS = {
+    "C0": "o",
+    "C1": "^",
+    "C2": "s",
+    "C3": "D",
+    "C4": "P",
+    "C5": "X",
+}
+
+CLUSTER_PROJECTION_STATUS_MARKERS = {
+    "Not degraded": "o",
+    "Degraded": "^",
+    "Unavailable": "s",
+}
+
 CLUSTER_METRIC_DISPLAY_NAMES = {
     "service_degraded": "Degradation rate",
     "signal_strength_dbm": "Signal strength",
@@ -1196,19 +1211,24 @@ def _draw_projection_panel(
     group_column: str,
     group_order: list[str],
     color_map: dict[str, str],
+    marker_map: dict[str, str],
     panel_label: str,
 ) -> None:
     for group in group_order:
         group_data = data[data[group_column].astype("string").eq(group)]
         if group_data.empty:
             continue
+        
+        marker = marker_map.get(group, "o")
+        marker_size = 7.2 if marker != "o" else 5.2
 
         ax.scatter(
             group_data["pc1"],
             group_data["pc2"],
-            s=5.2,
+            s=marker_size,
             alpha=0.72,
             linewidths=0,
+            marker=marker,
             color=color_map.get(group, "0.45"),
             label=group,
         )
@@ -1310,6 +1330,7 @@ def plot_cluster_projection_view(
         group_column="cluster_name",
         group_order=cluster_order,
         color_map=CLUSTER_PROJECTION_CLUSTER_COLORS,
+        marker_map=CLUSTER_PROJECTION_CLUSTER_MARKERS,
         panel_label="(a) K-Means profiles",
     )
 
@@ -1319,6 +1340,7 @@ def plot_cluster_projection_view(
         group_column="degradation_status",
         group_order=status_order,
         color_map=CLUSTER_PROJECTION_STATUS_COLORS,
+        marker_map=CLUSTER_PROJECTION_STATUS_MARKERS,
         panel_label="(b) Service-degradation label",
     )
 
