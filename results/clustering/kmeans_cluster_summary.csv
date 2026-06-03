@@ -1,0 +1,3 @@
+feature_block,cluster_label,profile_label,row_count,row_fraction,post_hoc_degradation_rate,signal_strength_dbm_mean,download_speed_mbps_mean,latency_ms_mean,downlink_shortfall_fraction_mean,network_type_mode,band_mode,app_type_mode,movement_speed_mode,congestion_level_mode,tower_load_mode
+reduced_context,0,stable-service profile,16181,0.32362,0.10846054013966998,-77.1534521970212,127.49654038687349,56.88604288980904,0.17046807127067284,5G SA,n78,Streaming,Static,Medium,Light
+reduced_context,1,elevated-degradation profile,33819,0.67638,0.697921286850587,-106.84207220793046,21.736919483130784,169.7821082823265,0.5868672477454746,5G NSA,LTE_Anchor,Call,Static,High,Light

@@ -106,7 +106,6 @@ DECISION_PATH_DARK_TEXT = "0.05"
 DECISION_PATH_LIGHT_TEXT = "white"
 
 
-
 def ensure_figure_parent(path: str | Path) -> Path:
     output_path = Path(path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -607,7 +606,6 @@ def build_warehouse_interaction_matrix_table(
     return pd.DataFrame(rows)
 
 
-
 def _wrap_decision_rule_label(text: Any, width: int = 68) -> str:
     wrapped_lines: list[str] = []
     for line in str(text).splitlines():
@@ -636,8 +634,7 @@ def _select_representative_decision_rules(
     missing_columns = required_columns.difference(leaf_rules.columns)
     if missing_columns:
         raise ValueError(
-            "Missing decision-rule columns: "
-            + ", ".join(sorted(missing_columns))
+            "Missing decision-rule columns: " + ", ".join(sorted(missing_columns))
         )
 
     rules = leaf_rules[
@@ -830,6 +827,7 @@ def plot_representative_decision_paths(
     plt.close(fig)
     return output_path
 
+
 def plot_pruned_decision_tree(
     model: Any,
     feature_names: list[str],
@@ -857,64 +855,751 @@ def plot_pruned_decision_tree(
     return output_path
 
 
-def plot_clustering_elbow_curve(validation: pd.DataFrame, path: str | Path) -> Path:
-    data = validation[
-        (validation["method"] == "kmeans") & validation["inertia"].notna()
-    ].copy()
-    fig, ax = plt.subplots(figsize=(7.0, 4.5))
+def _cluster_plot_frame(
+    dataframe: pd.DataFrame,
+    feature_block: str | None = None,
+) -> pd.DataFrame:
+    output = dataframe.copy()
+    if feature_block and "feature_block" in output.columns:
+        selected = output[output["feature_block"].astype("string").eq(feature_block)]
+        if not selected.empty:
+            output = selected.copy()
+    return output
+
+
+CLUSTER_METHOD_DISPLAY_NAMES = {
+    "kmeans": "K-Means",
+    "hierarchical": "Hierarchical",
+    "gaussian_mixture": "Gaussian mixture",
+}
+
+CLUSTER_METHOD_COLORS = {
+    "kmeans": "#1f77b4",
+    "hierarchical": "#b24a2f",
+    "gaussian_mixture": "#c79a00",
+}
+
+CLUSTER_METHOD_MARKERS = {
+    "kmeans": "o",
+    "hierarchical": "s",
+    "gaussian_mixture": "^",
+}
+
+CLUSTER_METHOD_LINESTYLES = {
+    "kmeans": "-",
+    "hierarchical": "--",
+    "gaussian_mixture": "-.",
+}
+
+CLUSTER_PROJECTION_CLUSTER_COLORS = {
+    "C0": "#1f77b4",
+    "C1": "#c79a00",
+    "C2": "#b24a2f",
+    "C3": "#6a3d9a",
+    "C4": "#4d9221",
+    "C5": "#8c510a",
+}
+
+CLUSTER_PROJECTION_STATUS_COLORS = {
+    "Not degraded": "#1f77b4",
+    "Degraded": "#b24a2f",
+    "Unavailable": "0.55",
+}
+
+CLUSTER_METRIC_DISPLAY_NAMES = {
+    "service_degraded": "Degradation rate",
+    "signal_strength_dbm": "Signal strength",
+    "download_speed_mbps": "Download speed",
+    "upload_speed_mbps": "Upload speed",
+    "latency_ms": "Latency",
+    "jitter_ms": "Jitter",
+    "throughput_satisfaction_ratio": "Throughput satisfaction",
+    "downlink_shortfall_fraction": "Downlink shortfall",
+    "offered_downlink_mbps": "Offered downlink",
+    "offered_upload_mbps": "Offered uplink",
+    "link_capacity_downlink_mbps": "Downlink capacity",
+    "distance_to_tower_km": "Tower distance",
+    "distance_2d_m": "2D distance",
+    "path_loss_db": "Path loss",
+    "contextual_penalty_db": "Context penalty",
+    "interval_handover_count": "Handover count",
+    "activity_factor": "Activity factor",
+    "data_usage_mb": "Data usage",
+}
+
+CLUSTER_EFFECT_COLUMNS = [
+    "service_degraded",
+    "signal_strength_dbm",
+    "download_speed_mbps",
+    "latency_ms",
+    "throughput_satisfaction_ratio",
+    "downlink_shortfall_fraction",
+    "link_capacity_downlink_mbps",
+    "path_loss_db",
+    "distance_to_tower_km",
+]
+
+
+def _cluster_metric_label(metric: str) -> str:
+    return CLUSTER_METRIC_DISPLAY_NAMES.get(
+        metric,
+        str(metric)
+        .replace("_", " ")
+        .replace(" dbm", " dBm")
+        .replace(" mbps", " Mbps")
+        .title(),
+    )
+
+
+def _selected_k_from_table(
+    selection: pd.DataFrame, method: str = "kmeans"
+) -> int | None:
+    required = {"method", "selected_k"}
+    if selection.empty or not required.issubset(selection.columns):
+        return None
+    candidates = selection[selection["method"].astype("string").eq(method)].copy()
+    if "status" in candidates.columns:
+        selected = candidates[candidates["status"].astype("string").eq("selected")]
+        if not selected.empty:
+            candidates = selected
+    if candidates.empty:
+        return None
+    value = pd.to_numeric(candidates.iloc[0]["selected_k"], errors="coerce")
+    if pd.isna(value):
+        return None
+    return int(value)
+
+
+def _format_cluster_value(metric: str, value: Any) -> str:
+    numeric_value = pd.to_numeric(pd.Series([value]), errors="coerce").iloc[0]
+    if pd.isna(numeric_value):
+        return "—"
+    if metric in {
+        "service_degraded",
+        "throughput_satisfaction_ratio",
+        "downlink_shortfall_fraction",
+        "activity_factor",
+        "row_fraction",
+    }:
+        return f"{100.0 * float(numeric_value):.1f}%"
+    if metric in {"signal_strength_dbm", "path_loss_db", "contextual_penalty_db"}:
+        return f"{float(numeric_value):.1f} dB"
+    if metric in {
+        "download_speed_mbps",
+        "upload_speed_mbps",
+        "offered_downlink_mbps",
+        "offered_upload_mbps",
+        "link_capacity_downlink_mbps",
+    }:
+        return f"{float(numeric_value):.1f} Mbps"
+    if metric in {"latency_ms", "jitter_ms"}:
+        return f"{float(numeric_value):.2f} ms"
+    if metric == "distance_to_tower_km":
+        return f"{float(numeric_value):.3f} km"
+    if metric == "row_count":
+        return f"{int(numeric_value):,}"
+    return f"{float(numeric_value):.2f}"
+
+
+def _profile_mean_column(profile: pd.DataFrame, metric: str) -> str | None:
+    mean_column = f"{metric}_mean"
+    if mean_column in profile.columns:
+        return mean_column
+    if metric in profile.columns:
+        return metric
+    return None
+
+
+def _standardized_cluster_matrix(matrix: pd.DataFrame) -> pd.DataFrame:
+    output = matrix.astype(float).copy()
+    for column in output.columns:
+        values = output[column]
+        std = values.std(ddof=0)
+        if pd.isna(std) or std == 0:
+            output[column] = 0.0
+        else:
+            output[column] = (values - values.mean()) / std
+    return output
+
+
+def plot_clustering_elbow_curve(
+    validation: pd.DataFrame,
+    path: str | Path,
+    selected_k: int | None = None,
+    feature_block: str | None = None,
+) -> Path:
+    data = _cluster_plot_frame(validation, feature_block)
+    data = data[(data["method"] == "kmeans") & data["inertia"].notna()].copy()
+    data = data.sort_values("k")
+
+    fig, ax = plt.subplots(figsize=(6.2, 3.8))
     if not data.empty:
-        ax.plot(data["k"], data["inertia"], marker="o")
+        ax.plot(data["k"], data["inertia"], marker="o", linewidth=1.7)
+        if selected_k is not None and selected_k in set(data["k"].astype(int)):
+            selected_row = data[data["k"].astype(int).eq(selected_k)].iloc[0]
+            ax.scatter(
+                [selected_k],
+                [selected_row["inertia"]],
+                s=80,
+                edgecolor="0.1",
+                linewidth=0.8,
+                zorder=3,
+            )
+            ax.axvline(selected_k, linewidth=0.8, linestyle=(0, (4, 4)), color="0.35")
+            ax.text(
+                selected_k,
+                float(selected_row["inertia"]),
+                "  Selected K",
+                va="center",
+                fontsize=8.5,
+                color="0.15",
+            )
     ax.set_xlabel("K")
     ax.set_ylabel("Inertia")
-    ax.grid(True, linewidth=0.4, alpha=0.5)
+    ax.grid(axis="y", linewidth=0.4, alpha=0.45)
+    ax.spines["top"].set_visible(False)
+    ax.spines["right"].set_visible(False)
     output_path = save_figure(fig, path)
     plt.close(fig)
     return output_path
 
 
 def plot_clustering_silhouette_scores(
-    validation: pd.DataFrame, path: str | Path
+    validation: pd.DataFrame,
+    path: str | Path,
+    selected_k: int | None = None,
+    feature_block: str | None = None,
 ) -> Path:
-    data = validation[validation["silhouette_score"].notna()].copy()
-    fig, ax = plt.subplots(figsize=(8.0, 4.8))
-    for method, group in data.groupby("method"):
-        if group["k"].notna().any():
-            ordered = group.sort_values("k")
-            ax.plot(ordered["k"], ordered["silhouette_score"], marker="o", label=method)
+    data = _cluster_plot_frame(validation, feature_block)
+    data = data[data["silhouette_score"].notna()].copy()
+    data = data[data["method"].isin(CLUSTER_METHOD_DISPLAY_NAMES)].copy()
+
+    fig, ax = plt.subplots(figsize=(6.6, 4.0))
+
+    for method in ["kmeans", "hierarchical", "gaussian_mixture"]:
+        group = data[data["method"].eq(method)].dropna(subset=["k"]).sort_values("k")
+        if group.empty:
+            continue
+
+        ax.plot(
+            group["k"],
+            group["silhouette_score"],
+            marker=CLUSTER_METHOD_MARKERS[method],
+            linestyle=CLUSTER_METHOD_LINESTYLES[method],
+            linewidth=1.8,
+            markersize=5.8,
+            color=CLUSTER_METHOD_COLORS[method],
+            label=CLUSTER_METHOD_DISPLAY_NAMES[method],
+        )
+
+    if selected_k is not None:
+        ax.axvline(
+            selected_k,
+            linewidth=0.8,
+            linestyle=(0, (4, 4)),
+            color="0.35",
+        )
+        if not data.empty:
+            ymax = float(data["silhouette_score"].max())
+            ax.text(
+                selected_k + 0.06,
+                ymax - 0.005,
+                "Selected K",
+                fontsize=8.3,
+                color="0.18",
+                va="top",
+            )
+
     ax.set_xlabel("K")
     ax.set_ylabel("Silhouette score")
     if not data.empty:
-        ax.legend(frameon=False)
-    ax.grid(True, linewidth=0.4, alpha=0.5)
+        ax.legend(frameon=False, fontsize=8.5)
+    ax.grid(axis="y", linewidth=0.4, alpha=0.45)
+    ax.spines["top"].set_visible(False)
+    ax.spines["right"].set_visible(False)
+
     output_path = save_figure(fig, path)
     plt.close(fig)
     return output_path
 
 
-def plot_cluster_profiles(profile: pd.DataFrame, path: str | Path) -> Path:
-    required = {"method", "cluster_label", "row_count", "service_degraded_mean"}
-    fig, ax = plt.subplots(figsize=(8.0, 5.0))
+def plot_cluster_profile_effect_sizes(
+    effect_sizes: pd.DataFrame,
+    path: str | Path,
+) -> Path:
+    data = effect_sizes[effect_sizes["metric"].isin(CLUSTER_EFFECT_COLUMNS)].copy()
+    data = data.dropna(subset=["standardized_mean_difference"])
+    data["metric_label"] = data["metric"].map(_cluster_metric_label)
+    data["absolute_effect"] = data["standardized_mean_difference"].abs()
+    data = data.sort_values(
+        ["absolute_effect", "standardized_mean_difference"],
+        ascending=[True, True],
+    )
 
-    if required.issubset(profile.columns):
-        data = profile[profile["method"] == "kmeans"].copy()
-        data = data.sort_values("service_degraded_mean", ascending=True)
-        labels = [f"C{int(value)}" for value in data["cluster_label"]]
-        ax.barh(labels, data["service_degraded_mean"])
-        ax.set_xlabel("Mean degradation label")
-        ax.set_ylabel("KMeans cluster")
-        for index, row in enumerate(data.to_dict("records")):
-            ax.text(
-                float(row["service_degraded_mean"]),
-                index,
-                f" n={int(row['row_count'])}",
+    fig_height = max(3.4, 0.42 * max(len(data), 1) + 1.0)
+    fig, ax = plt.subplots(figsize=(7.2, fig_height))
+    if data.empty:
+        ax.axis("off")
+        ax.text(
+            0.5, 0.5, "No effect-size records", ha="center", va="center", fontsize=9
+        )
+    else:
+        y_positions = np.arange(len(data))
+        values = data["standardized_mean_difference"].to_numpy(dtype=float)
+        ax.hlines(y_positions, 0, values, linewidth=1.5, color="0.65", zorder=1)
+        ax.scatter(
+            values, y_positions, s=64, edgecolor="white", linewidth=0.7, zorder=2
+        )
+        ax.axvline(0, color="0.25", linewidth=0.8)
+        ax.set_yticks(y_positions)
+        ax.set_yticklabels(data["metric_label"], fontsize=8.5)
+        reference = (
+            data["reference_cluster"].iloc[0]
+            if "reference_cluster" in data.columns
+            else np.nan
+        )
+        comparison = (
+            data["comparison_cluster"].iloc[0]
+            if "comparison_cluster" in data.columns
+            else np.nan
+        )
+        axis_label = "Standardized mean difference"
+        if pd.notna(reference) and pd.notna(comparison):
+            axis_label = f"{axis_label} (C{int(comparison)} − C{int(reference)})"
+        ax.set_xlabel(axis_label)
+        ax.grid(axis="x", linewidth=0.4, alpha=0.45)
+        ax.spines["top"].set_visible(False)
+        ax.spines["right"].set_visible(False)
+    output_path = save_figure(fig, path)
+    plt.close(fig)
+    return output_path
+
+
+def _projection_axis_limits(values: pd.Series) -> tuple[float, float]:
+    numeric_values = pd.to_numeric(values, errors="coerce").dropna()
+    if numeric_values.empty:
+        return -1.0, 1.0
+
+    lower = float(numeric_values.quantile(0.005))
+    upper = float(numeric_values.quantile(0.995))
+
+    if lower == upper:
+        return lower - 1.0, upper + 1.0
+
+    padding = 0.06 * (upper - lower)
+    return lower - padding, upper + padding
+
+
+def _draw_projection_panel(
+    ax: Any,
+    data: pd.DataFrame,
+    group_column: str,
+    group_order: list[str],
+    color_map: dict[str, str],
+    panel_label: str,
+) -> None:
+    for group in group_order:
+        group_data = data[data[group_column].astype("string").eq(group)]
+        if group_data.empty:
+            continue
+
+        ax.scatter(
+            group_data["pc1"],
+            group_data["pc2"],
+            s=5.2,
+            alpha=0.72,
+            linewidths=0,
+            color=color_map.get(group, "0.45"),
+            label=group,
+        )
+
+    ax.set_xlabel("")
+    ax.set_ylabel("")
+    ax.set_xticklabels([])
+    ax.set_yticklabels([])
+    ax.tick_params(length=2.2, width=0.45, color="0.45")
+
+    for spine in ax.spines.values():
+        spine.set_linewidth(0.65)
+        spine.set_color("0.55")
+
+    ax.legend(
+        frameon=False,
+        fontsize=7.8,
+        loc="upper right",
+        markerscale=1.7,
+        handletextpad=0.25,
+        borderaxespad=0.25,
+    )
+
+    ax.text(
+        0.5,
+        -0.13,
+        panel_label,
+        transform=ax.transAxes,
+        ha="center",
+        va="top",
+        fontsize=11,
+        color="0.08",
+    )
+
+
+def plot_cluster_projection_view(
+    projection: pd.DataFrame,
+    path: str | Path,
+) -> Path:
+    required_columns = {"pc1", "pc2", "cluster_name", "degradation_status"}
+
+    if projection.empty or not required_columns.issubset(projection.columns):
+        fig, ax = plt.subplots(figsize=(5.8, 3.2))
+        ax.axis("off")
+        ax.text(
+            0.5,
+            0.5,
+            "No projection records",
+            ha="center",
+            va="center",
+            fontsize=9,
+        )
+        output_path = save_figure(fig, path)
+        plt.close(fig)
+        return output_path
+
+    data = projection.copy()
+    data["pc1"] = pd.to_numeric(data["pc1"], errors="coerce")
+    data["pc2"] = pd.to_numeric(data["pc2"], errors="coerce")
+    data = data.dropna(subset=["pc1", "pc2"])
+
+    if data.empty:
+        fig, ax = plt.subplots(figsize=(5.8, 3.2))
+        ax.axis("off")
+        ax.text(
+            0.5,
+            0.5,
+            "No valid projection coordinates",
+            ha="center",
+            va="center",
+            fontsize=9,
+        )
+        output_path = save_figure(fig, path)
+        plt.close(fig)
+        return output_path
+
+    cluster_order = sorted(data["cluster_name"].astype(str).unique())
+    status_values = set(data["degradation_status"].astype(str))
+    status_order = [
+        status
+        for status in ["Not degraded", "Degraded", "Unavailable"]
+        if status in status_values
+    ]
+
+    x_limits = _projection_axis_limits(data["pc1"])
+    y_limits = _projection_axis_limits(data["pc2"])
+
+    fig, axes = plt.subplots(
+        1,
+        2,
+        figsize=(9.7, 4.1),
+        sharex=True,
+        sharey=True,
+    )
+
+    _draw_projection_panel(
+        axes[0],
+        data,
+        group_column="cluster_name",
+        group_order=cluster_order,
+        color_map=CLUSTER_PROJECTION_CLUSTER_COLORS,
+        panel_label="(a) K-Means profiles",
+    )
+
+    _draw_projection_panel(
+        axes[1],
+        data,
+        group_column="degradation_status",
+        group_order=status_order,
+        color_map=CLUSTER_PROJECTION_STATUS_COLORS,
+        panel_label="(b) Service-degradation label",
+    )
+
+    for ax in axes:
+        ax.set_xlim(*x_limits)
+        ax.set_ylim(*y_limits)
+
+    fig.subplots_adjust(
+        left=0.045,
+        right=0.99,
+        bottom=0.16,
+        top=0.98,
+        wspace=0.08,
+    )
+
+    output_path = save_figure(fig, path)
+    plt.close(fig)
+    return output_path
+
+
+def plot_cluster_gap_and_seed_agreement(
+    null_baseline: pd.DataFrame,
+    pairwise_stability: pd.DataFrame,
+    path: str | Path,
+) -> Path:
+    fig, axes = plt.subplots(1, 2, figsize=(10.4, 3.9))
+    ax_gap, ax_seed = axes
+
+    if null_baseline.empty:
+        ax_gap.axis("off")
+        ax_gap.text(
+            0.5,
+            0.5,
+            "No null-baseline records",
+            ha="center",
+            va="center",
+            fontsize=9,
+        )
+    else:
+        row = null_baseline.iloc[0]
+        observed_gap = float(row["observed_degradation_rate_gap"])
+        random_mean = float(row["random_gap_mean"])
+        random_std = float(row["random_gap_std"])
+        random_p95 = float(row["random_gap_p95"])
+        random_p99 = float(row["random_gap_p99"])
+        empirical_p = float(row["empirical_p_value_random_gap_ge_observed"])
+
+        xmax = max(observed_gap, random_p99) * 1.10
+
+        ax_gap.hlines(
+            y=0.0,
+            xmin=0.0,
+            xmax=xmax,
+            color="0.86",
+            linewidth=5.0,
+            zorder=0,
+        )
+        ax_gap.scatter(
+            [random_mean],
+            [0.0],
+            s=54,
+            color="0.65",
+            edgecolor="0.35",
+            linewidth=0.6,
+            zorder=2,
+            label="Random mean",
+        )
+        ax_gap.hlines(
+            y=0.0,
+            xmin=max(0.0, random_mean - random_std),
+            xmax=random_mean + random_std,
+            color="0.35",
+            linewidth=1.2,
+            zorder=1,
+        )
+        ax_gap.scatter(
+            [random_p95],
+            [0.0],
+            s=50,
+            marker="D",
+            color="0.45",
+            zorder=2,
+            label="Random p95",
+        )
+        ax_gap.scatter(
+            [random_p99],
+            [0.0],
+            s=58,
+            marker="^",
+            color="0.30",
+            zorder=2,
+            label="Random p99",
+        )
+        ax_gap.scatter(
+            [observed_gap],
+            [0.0],
+            s=68,
+            color="#b24a2f",
+            edgecolor="0.15",
+            linewidth=0.6,
+            zorder=3,
+            label="Observed gap",
+        )
+        ax_gap.vlines(
+            observed_gap,
+            ymin=-0.10,
+            ymax=0.10,
+            color="#b24a2f",
+            linewidth=1.2,
+            zorder=2,
+        )
+        ax_gap.text(
+            observed_gap,
+            0.14,
+            f"Observed = {observed_gap:.3f}\nEmpirical p = {empirical_p:.3f}",
+            ha="center",
+            va="bottom",
+            fontsize=8.2,
+            color="0.15",
+        )
+
+        ax_gap.set_xlim(0.0, xmax)
+        ax_gap.set_ylim(-0.22, 0.32)
+        ax_gap.set_yticks([])
+        ax_gap.set_xlabel("Degradation-rate gap")
+        ax_gap.legend(frameon=False, fontsize=8.0, loc="upper left")
+        ax_gap.spines["top"].set_visible(False)
+        ax_gap.spines["right"].set_visible(False)
+        ax_gap.spines["left"].set_visible(False)
+
+    if (
+        pairwise_stability.empty
+        or "adjusted_rand_index" not in pairwise_stability.columns
+    ):
+        ax_seed.axis("off")
+        ax_seed.text(
+            0.5,
+            0.5,
+            "No seed-agreement records",
+            ha="center",
+            va="center",
+            fontsize=9,
+        )
+    else:
+        ari_values = pd.to_numeric(
+            pairwise_stability["adjusted_rand_index"],
+            errors="coerce",
+        ).dropna()
+
+        if ari_values.empty:
+            ax_seed.axis("off")
+            ax_seed.text(
+                0.5,
+                0.5,
+                "No valid ARI values",
+                ha="center",
                 va="center",
-                fontsize=8,
+                fontsize=9,
+            )
+        else:
+            ax_seed.boxplot(
+                ari_values,
+                vert=False,
+                widths=0.45,
+                patch_artist=True,
+                boxprops={
+                    "facecolor": "0.90",
+                    "edgecolor": "0.35",
+                    "linewidth": 0.9,
+                },
+                medianprops={"color": "0.20", "linewidth": 1.1},
+                whiskerprops={"color": "0.35", "linewidth": 0.9},
+                capprops={"color": "0.35", "linewidth": 0.9},
+            )
+            ax_seed.scatter(
+                ari_values,
+                np.ones(len(ari_values)),
+                s=26,
+                color="#1f77b4",
+                edgecolor="white",
+                linewidth=0.5,
+                zorder=3,
             )
 
-    ax.grid(True, axis="x", linewidth=0.4, alpha=0.5)
+            mean_ari = float(ari_values.mean())
+            min_ari = float(ari_values.min())
+            max_ari = float(ari_values.max())
+
+            ax_seed.axvline(
+                mean_ari,
+                color="#b24a2f",
+                linewidth=1.1,
+                linestyle=(0, (4, 3)),
+            )
+            ax_seed.text(
+                mean_ari,
+                1.24,
+                f"Mean = {mean_ari:.3f}\nMin = {min_ari:.3f}\nMax = {max_ari:.3f}",
+                ha="center",
+                va="bottom",
+                fontsize=8.2,
+                color="0.15",
+            )
+
+            lower = max(0.0, min_ari - 0.01)
+            upper = min(1.005, max_ari + 0.005)
+            ax_seed.set_xlim(lower, upper)
+            ax_seed.set_yticks([])
+            ax_seed.set_xlabel("Pairwise adjusted Rand index")
+            ax_seed.spines["top"].set_visible(False)
+            ax_seed.spines["right"].set_visible(False)
+            ax_seed.spines["left"].set_visible(False)
+            ax_seed.grid(axis="x", linewidth=0.4, alpha=0.45)
+
+    fig.tight_layout()
     output_path = save_figure(fig, path)
     plt.close(fig)
     return output_path
+
+
+def plot_clustering_analysis_outputs(
+    results_dir: str | Path,
+    figures_dir: str | Path,
+    feature_block: str = "reduced_context",
+) -> dict[str, Path]:
+    results_path = Path(results_dir)
+    figures_path = Path(figures_dir)
+    figures_path.mkdir(parents=True, exist_ok=True)
+
+    validation = pd.read_csv(results_path / "clustering_validation.csv")
+    selection_path = results_path / "clustering_model_selection.csv"
+    selection = (
+        pd.read_csv(selection_path) if selection_path.exists() else pd.DataFrame()
+    )
+    selected_k = _selected_k_from_table(selection, method="kmeans")
+    effect_sizes_path = results_path / "cluster_profile_effect_sizes.csv"
+    projection_path = results_path / "cluster_projection_table.csv"
+    null_baseline_path = results_path / "cluster_null_baseline.csv"
+    pairwise_stability_path = results_path / "kmeans_pairwise_stability.csv"
+
+    outputs: dict[str, Path] = {
+        "elbow_curve": plot_clustering_elbow_curve(
+            validation,
+            figures_path / "elbow_curve.pdf",
+            selected_k=selected_k,
+            feature_block=feature_block,
+        ),
+        "silhouette_scores": plot_clustering_silhouette_scores(
+            validation,
+            figures_path / "silhouette_scores.pdf",
+            selected_k=selected_k,
+            feature_block=feature_block,
+        ),
+    }
+
+    if effect_sizes_path.exists():
+        effect_sizes = pd.read_csv(effect_sizes_path)
+        outputs["cluster_profile_effect_sizes_figure"] = (
+            plot_cluster_profile_effect_sizes(
+                effect_sizes,
+                figures_path / "cluster_profile_effect_sizes.pdf",
+            )
+        )
+
+    if projection_path.exists():
+        projection = pd.read_csv(projection_path)
+        outputs["cluster_projection_view"] = plot_cluster_projection_view(
+            projection,
+            figures_path / "cluster_projection_view.pdf",
+        )
+
+    if null_baseline_path.exists() and pairwise_stability_path.exists():
+        null_baseline = pd.read_csv(null_baseline_path)
+        pairwise_stability = pd.read_csv(pairwise_stability_path)
+        outputs["cluster_gap_and_seed_agreement"] = plot_cluster_gap_and_seed_agreement(
+            null_baseline,
+            pairwise_stability,
+            figures_path / "cluster_gap_and_seed_agreement.pdf",
+        )
+
+    return outputs
 
 
 def plot_top_association_rules(
@@ -961,10 +1646,7 @@ def plot_external_metric_distribution(
         return None
 
     ordered_sources = (
-        working.groupby("source_dataset")["value"]
-        .median()
-        .sort_values()
-        .index.tolist()
+        working.groupby("source_dataset")["value"].median().sort_values().index.tolist()
     )
     data = [
         working.loc[working["source_dataset"] == source, "value"].to_numpy()
@@ -983,4 +1665,3 @@ def plot_external_metric_distribution(
     output_path = save_figure(fig, path)
     plt.close(fig)
     return output_path
-
