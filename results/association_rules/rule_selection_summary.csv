@@ -1,0 +1,3 @@
+algorithm,transaction_count,all_rule_count,exact_positive_consequent_count,no_target_in_antecedent_count,target_definition_antecedent_excluded_count,selected_degradation_rule_count,min_support,min_confidence,max_itemset_length
+apriori,50000,3112,233,233,112,121,0.05,0.6,3
+fp_growth,50000,3112,233,233,112,121,0.05,0.6,3

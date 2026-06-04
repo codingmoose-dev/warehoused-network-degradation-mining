@@ -1,0 +1,7 @@
+feature_block,method,selected_k,selected_eps,selected_min_samples,selection_metric,reporting_role,status
+reduced_context,kmeans,2.0,,,highest silhouette score on reduced context-only clustering inputs,primary,selected
+reduced_context,hierarchical,2.0,,,highest silhouette score on bounded sample,sensitivity,selected
+reduced_context,gaussian_mixture,3.0,,,highest silhouette score on bounded sample,sensitivity,selected
+reduced_context,gaussian_mixture_bic_reference,8.0,,,lowest BIC on bounded sample,diagnostic,reported_for_model_based_clustering_reference
+reduced_context,dbscan,,,,tested settings did not produce at least two non-noise clusters with acceptable noise and minimum cluster size,diagnostic,no_valid_density_partition
+reduced_context,optics,,,,tested settings did not produce at least two non-noise clusters with acceptable noise and minimum cluster size,diagnostic,no_valid_density_partition

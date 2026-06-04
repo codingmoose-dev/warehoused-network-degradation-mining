@@ -1,0 +1,3 @@
+method,status,reason,selected_eps,selected_min_samples,selected_min_cluster_size
+dbscan,no_valid_density_partition,tested settings did not produce at least two non-noise clusters with acceptable noise and minimum cluster size,,,
+optics,no_valid_density_partition,tested settings did not produce at least two non-noise clusters with acceptable noise and minimum cluster size,,,
