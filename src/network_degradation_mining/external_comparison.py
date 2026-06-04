@@ -691,8 +691,8 @@ def _pairwise_distances(comparison: pd.DataFrame) -> pd.DataFrame:
                     ),
                     "interpretation_note": (
                         "KS p-values are descriptive because the datasets differ "
-                        "in collection design and sample size; emphasize medians, "
-                        "IQRs, and distance measures in the manuscript."
+                        "in collection design and sample size; "
+                        "emphasize medians, IQRs, and distance measures."
                     ),
                 }
             )
@@ -903,7 +903,7 @@ def _metric_readiness_table(comparison: pd.DataFrame) -> pd.DataFrame:
     )
 
 
-def _manuscript_summary(pairwise_distances: pd.DataFrame) -> pd.DataFrame:
+def _external_summary(pairwise_distances: pd.DataFrame) -> pd.DataFrame:
     columns = [
         "metric",
         "metric_label",
@@ -920,7 +920,6 @@ def _manuscript_summary(pairwise_distances: pd.DataFrame) -> pd.DataFrame:
         "wasserstein_distance",
         "ks_statistic",
         "recommended_use",
-        "manuscript_note",
         "filter_note",
     ]
 
@@ -946,10 +945,6 @@ def _manuscript_summary(pairwise_distances: pd.DataFrame) -> pd.DataFrame:
                 "wasserstein_distance": row["wasserstein_distance"],
                 "ks_statistic": row["ks_statistic"],
                 "recommended_use": row["recommended_use"],
-                "manuscript_note": (
-                    "Use as selected-variable external plausibility evidence; "
-                    "do not describe as field validation."
-                ),
                 "filter_note": row["filter_note"],
             }
         )
@@ -1045,8 +1040,7 @@ def _comparison_audit(
             "status": "ok",
             "notes": (
                 "KS statistics and p-values are descriptive because the datasets "
-                "have different collection designs and sample sizes; manuscript "
-                "interpretation should emphasize medians, IQRs, and distance measures."
+                "have different collection designs and sample sizes."
             ),
         },
         {
@@ -1087,7 +1081,7 @@ def run_external_reference_comparison(
     coverage = _coverage_table(combined)
     context_coverage = _context_coverage_table(combined)
     readiness = _metric_readiness_table(comparison)
-    manuscript_summary = _manuscript_summary(pairwise)
+    external_summary = _external_summary(pairwise)
     context_filter_audit = _context_filter_audit(comparison)
     audit_notes = _comparison_audit(load_audit, combined, comparison)
 
@@ -1101,8 +1095,8 @@ def run_external_reference_comparison(
         "external_metric_readiness": write_csv(
             readiness, results_path / "external_metric_readiness.csv"
         ),
-        "external_manuscript_summary": write_csv(
-            manuscript_summary, results_path / "external_manuscript_summary.csv"
+        "external_summary": write_csv(
+            external_summary, results_path / "external_summary.csv"
         ),
         "external_reference_coverage": write_csv(
             coverage, results_path / "external_reference_coverage.csv"

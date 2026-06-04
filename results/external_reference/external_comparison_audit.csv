@@ -4,5 +4,5 @@ main_dataset_source,ok,SynNetQoS remains the main warehouse and mining dataset.
 required_reference_sources,ok,All required reference sources were available.
 ucc_download_context_filter,ok,"UCC throughput comparisons use only application_context=Download. The full UCC production trace includes streaming sessions with bursty or idle bitrate periods, so the unfiltered throughput distribution is retained for coverage audit but not used as the main throughput comparison."
 simulator_reference_source,ok,The 5G-LENA/ns-3 simulator reference is a required controlled reference source for this comparison layer.
-statistical_test_scope,ok,"KS statistics and p-values are descriptive because the datasets have different collection designs and sample sizes; manuscript interpretation should emphasize medians, IQRs, and distance measures."
+statistical_test_scope,ok,KS statistics and p-values are descriptive because the datasets have different collection designs and sample sizes.
 reference_load_audit_rows,ok,Reference load audit row count: 4.

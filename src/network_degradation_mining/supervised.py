@@ -192,7 +192,7 @@ def _as_finite_array(values: Any) -> np.ndarray:
     return np.nan_to_num(array, nan=0.0, posinf=0.0, neginf=0.0)
 
 
-def _optional_xgboost_model() -> ModelSpec:
+def xgboost_model() -> ModelSpec:
     try:
         from xgboost import XGBClassifier
     except Exception as exc:
@@ -284,7 +284,7 @@ def _model_specs() -> list[ModelSpec]:
                 random_state=MODEL_RANDOM_STATE,
             ),
         ),
-        _optional_xgboost_model(),
+        xgboost_model(),
     ]
 
 
