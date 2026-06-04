@@ -2193,38 +2193,124 @@ def plot_top_association_rules(
     return output_path
 
 
+
+
+EXTERNAL_BOXPLOT_MEDIAN_COLOR = "#6E6E6E"
+
+
+def _external_source_order(
+    source_dataset: Any,
+    source_order: dict[str, int] | None,
+) -> int:
+    if source_order is None:
+        return 99
+    return source_order.get(str(source_dataset), 99)
+
+
+def _external_sample_values(
+    values: pd.Series,
+    sample_limit: int,
+    random_state: int,
+) -> np.ndarray:
+    clean = pd.to_numeric(values, errors="coerce").dropna().astype(float)
+    if len(clean) <= sample_limit:
+        return clean.to_numpy()
+    return clean.sample(n=sample_limit, random_state=random_state).to_numpy()
+
+
 def plot_external_metric_distribution(
-    plot_frame: pd.DataFrame,
+    comparison: pd.DataFrame,
+    metric: str,
     x_label: str,
     path: str | Path,
+    min_records: int = 20,
+    sample_limit: int = 15000,
+    random_state: int = 42,
+    source_order: dict[str, int] | None = None,
 ) -> Path | None:
-    required = {"source_dataset", "value"}
-    if not required.issubset(plot_frame.columns) or plot_frame.empty:
+    required_columns = {"metric", "source_dataset", "source_label", "value"}
+    if comparison.empty or not required_columns.issubset(comparison.columns):
         return None
 
-    working = plot_frame.copy()
-    working["value"] = pd.to_numeric(working["value"], errors="coerce")
-    working = working.dropna(subset=["source_dataset", "value"])
-    if working["source_dataset"].nunique(dropna=True) < 2:
+    metric_frame = comparison[comparison["metric"].astype(str).eq(str(metric))].copy()
+    if metric_frame.empty:
         return None
 
-    ordered_sources = (
-        working.groupby("source_dataset")["value"].median().sort_values().index.tolist()
+    plot_rows: list[pd.DataFrame] = []
+    group_columns = ["source_dataset", "source_label"]
+    for _, group in metric_frame.groupby(group_columns, dropna=False):
+        values = pd.to_numeric(group["value"], errors="coerce").dropna()
+        if len(values) < min_records:
+            continue
+
+        sampled = _external_sample_values(values, sample_limit, random_state)
+        representative = group.iloc[0]
+        plot_rows.append(
+            pd.DataFrame(
+                {
+                    "source_dataset": str(representative["source_dataset"]),
+                    "source_label": str(representative["source_label"]),
+                    "value": sampled,
+                }
+            )
+        )
+
+    if len(plot_rows) < 2:
+        return None
+
+    plot_frame = pd.concat(plot_rows, ignore_index=True)
+    if "synnetqos" not in set(plot_frame["source_dataset"].astype(str)):
+        return None
+
+    reference_sources = set(plot_frame["source_dataset"].astype(str)) - {"synnetqos"}
+    if not reference_sources:
+        return None
+
+    source_counts = plot_frame.groupby("source_label")["value"].size().to_dict()
+    label_order = (
+        plot_frame[["source_dataset", "source_label"]]
+        .drop_duplicates()
+        .assign(
+            source_order=lambda frame: frame["source_dataset"].map(
+                lambda value: _external_source_order(value, source_order)
+            )
+        )
+        .sort_values(["source_order", "source_label"])
     )
+
+    ordered_labels = label_order["source_label"].astype(str).tolist()
     data = [
-        working.loc[working["source_dataset"] == source, "value"].to_numpy()
-        for source in ordered_sources
+        plot_frame.loc[
+            plot_frame["source_label"].astype(str).eq(label), "value"
+        ].to_numpy()
+        for label in ordered_labels
+    ]
+    labels = [
+        f"{label}\n(n={source_counts.get(label, 0):,})" for label in ordered_labels
     ]
 
-    fig, ax = plt.subplots(figsize=(8.0, 5.0))
+    output_path = ensure_figure_parent(path)
+    fig, ax = plt.subplots(figsize=(8.8, 4.8))
+    boxplot_kwargs: dict[str, Any] = {
+        "showfliers": False,
+        "medianprops": {
+            "color": EXTERNAL_BOXPLOT_MEDIAN_COLOR,
+            "linewidth": 1.6,
+        },
+    }
     try:
-        ax.boxplot(data, tick_labels=ordered_sources, showfliers=False)
+        ax.boxplot(data, tick_labels=labels, **boxplot_kwargs)
     except TypeError:
-        ax.boxplot(data, labels=ordered_sources, showfliers=False)
+        ax.boxplot(data, labels=labels, **boxplot_kwargs)
+
     ax.set_xlabel("Dataset")
     ax.set_ylabel(x_label)
-    ax.tick_params(axis="x", rotation=25)
+    ax.tick_params(axis="x", rotation=22)
     ax.grid(True, axis="y", linewidth=0.4, alpha=0.5)
-    output_path = save_figure(fig, path)
+    ax.spines["top"].set_visible(False)
+    ax.spines["right"].set_visible(False)
+
+    fig.tight_layout()
+    save_figure(fig, output_path)
     plt.close(fig)
     return output_path

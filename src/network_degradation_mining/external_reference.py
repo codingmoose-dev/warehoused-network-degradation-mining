@@ -426,7 +426,10 @@ def _prepare_ucc_file(path: Path, ucc_root: Path, root: Path) -> pd.DataFrame:
     output["speed_raw"] = _numeric_series(raw, "Speed")
     output["scenario"] = context["scenario"]
     output["notes"] = (
-        "production trace; source bitrate unit confirmed as kbps in source documentation; throughput_mbps derived by dividing source bitrate by 1000; ping loss converted to fraction when source values are percent-like"
+        "production trace; source bitrate unit confirmed as kbps in source "
+        "documentation; throughput_mbps fields are derived by dividing source "
+        "bitrate by 1000; ping loss is converted to a fraction when source "
+        "values are percent-like"
     )
 
     return output
@@ -700,7 +703,8 @@ def _prepare_simulator_summary_file(
     output["speed_raw"] = pd.NA
     output["scenario"] = _scenario_from_simulator_columns(raw, path)
     output["notes"] = (
-        "controlled 5G-LENA reference run; summary metrics parsed from curated simulator output"
+        "controlled 5G-LENA reference run; summary metrics parsed from "
+        "curated simulator output"
     )
 
     comparable_metrics = [
@@ -863,7 +867,9 @@ def build_ns3_lena_run_audit(
                 "parsed_reference_row_count": int(len(simulator)),
                 "output_status": "waiting_for_controlled_runs",
                 "parser_status": "review",
-                "notes": "No simulator manifest or curated summary CSV files were found.",
+                "notes": (
+                    "No simulator manifest or curated summary CSV files were found."
+                ),
             }
         )
 
@@ -1317,13 +1323,32 @@ def _numeric_quality_row(dataframe: pd.DataFrame, column: str) -> dict[str, Any]
         status = "ok"
 
     notes_by_column = {
-        "download_bitrate_raw": "Source bitrate is retained in kbps as reported by the UCC source documentation.",
-        "upload_bitrate_raw": "Source bitrate is retained in kbps as reported by the UCC source documentation.",
-        "download_throughput_mbps": "Derived from UCC DL_bitrate by converting kbps to Mbps.",
-        "upload_throughput_mbps": "Derived from UCC UL_bitrate by converting kbps to Mbps.",
-        "packet_loss_fraction": "Prepared value is stored as a fraction; percent-like source values are converted during UCC preparation.",
-        "latency_ms": "Ping average is context-limited and is mostly populated for download traces.",
-        "jitter_ms": "Ping standard deviation is context-limited and is mostly populated for download traces.",
+        "download_bitrate_raw": (
+            "Source bitrate is retained in kbps as reported by the UCC "
+            "source documentation."
+        ),
+        "upload_bitrate_raw": (
+            "Source bitrate is retained in kbps as reported by the UCC "
+            "source documentation."
+        ),
+        "download_throughput_mbps": (
+            "Derived from UCC DL_bitrate by converting kbps to Mbps."
+        ),
+        "upload_throughput_mbps": (
+            "Derived from UCC UL_bitrate by converting kbps to Mbps."
+        ),
+        "packet_loss_fraction": (
+            "Prepared value is stored as a fraction; percent-like source values "
+            "are converted during UCC preparation."
+        ),
+        "latency_ms": (
+            "Ping average is context-limited and is mostly populated for "
+            "download traces."
+        ),
+        "jitter_ms": (
+            "Ping standard deviation is context-limited and is mostly populated "
+            "for download traces."
+        ),
     }
 
     if affected_count > 0:
@@ -1387,7 +1412,10 @@ def build_ucc_reference_quality_audit(ucc: pd.DataFrame) -> pd.DataFrame:
                 "source_dataset": "ucc_5g_context",
                 "audit_section": "unit_handling",
                 "check_name": "bitrate_unit_policy",
-                "column_name": "download_bitrate_raw,upload_bitrate_raw,download_throughput_mbps,upload_throughput_mbps",
+                "column_name": (
+                    "download_bitrate_raw,upload_bitrate_raw,"
+                    "download_throughput_mbps,upload_throughput_mbps"
+                ),
                 "group_name": "",
                 "group_value": "",
                 "row_count": int(len(ucc)),
@@ -1408,7 +1436,11 @@ def build_ucc_reference_quality_audit(ucc: pd.DataFrame) -> pd.DataFrame:
                 "affected_count": int(len(ucc)),
                 "affected_fraction": 1.0 if len(ucc) else 0.0,
                 "status": "ok",
-                "notes": "UCC DL_bitrate and UL_bitrate are documented as kbps; raw bitrate values are retained and throughput_mbps fields are derived by dividing by 1000.",
+                "notes": (
+                    "UCC DL_bitrate and UL_bitrate are documented as kbps; raw "
+                    "bitrate values are retained and throughput_mbps fields are "
+                    "derived by dividing by 1000."
+                ),
             },
             {
                 "source_dataset": "ucc_5g_context",
@@ -1432,7 +1464,10 @@ def build_ucc_reference_quality_audit(ucc: pd.DataFrame) -> pd.DataFrame:
                 "affected_count": 0,
                 "affected_fraction": 0.0,
                 "status": "ok",
-                "notes": "PINGLOSS is converted to a fraction when source values are percent-like.",
+                "notes": (
+                    "PINGLOSS is converted to a fraction when source values are "
+                    "percent-like."
+                ),
             },
         ]
     )
