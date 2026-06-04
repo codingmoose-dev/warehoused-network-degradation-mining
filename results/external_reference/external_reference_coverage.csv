@@ -1,0 +1,6 @@
+source_dataset,source_label,row_count,signal_dbm_non_missing_count,signal_dbm_non_missing_fraction,download_throughput_mbps_non_missing_count,download_throughput_mbps_non_missing_fraction,upload_throughput_mbps_non_missing_count,upload_throughput_mbps_non_missing_fraction,latency_ms_non_missing_count,latency_ms_non_missing_fraction,jitter_ms_non_missing_count,jitter_ms_non_missing_fraction,packet_loss_fraction_non_missing_count,packet_loss_fraction_non_missing_fraction,offered_downlink_mbps_non_missing_count,offered_downlink_mbps_non_missing_fraction
+synnetqos,SynNetQoS,50000,50000,1.0,50000,1.0,50000,1.0,50000,1.0,50000,1.0,0,0.0,50000,1.0
+vienna_4g5g,Vienna 4G/5G,3895145,3895125,0.9999948654029568,1839718,0.4723105301599812,1838818,0.4720794732930353,0,0.0,0,0.0,0,0.0,0,0.0
+campus_qos,Campus QoS,302,0,0.0,302,1.0,302,1.0,0,0.0,302,1.0,302,1.0,302,1.0
+ucc_5g_context,UCC 5G Context,188711,188711,1.0,188711,1.0,188711,1.0,3208,0.016999538977590073,3208,0.016999538977590073,3272,0.01733868189983626,0,0.0
+ns3_lena,5G-LENA/ns-3,12,0,0.0,12,1.0,0,0.0,12,1.0,12,1.0,12,1.0,12,1.0

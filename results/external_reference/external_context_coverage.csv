@@ -1,0 +1,22 @@
+source_dataset,source_label,measurement_context,application_context,mobility_context,row_count,download_throughput_non_missing_count,upload_throughput_non_missing_count,latency_non_missing_count,jitter_non_missing_count
+synnetqos,SynNetQoS,synthetic_session_record,Browse,Driving,519,519,519,519,519
+synnetqos,SynNetQoS,synthetic_session_record,Browse,Static,6204,6204,6204,6204,6204
+synnetqos,SynNetQoS,synthetic_session_record,Browse,Walking,5709,5709,5709,5709,5709
+synnetqos,SynNetQoS,synthetic_session_record,Call,Driving,473,473,473,473,473
+synnetqos,SynNetQoS,synthetic_session_record,Call,Static,6248,6248,6248,6248,6248
+synnetqos,SynNetQoS,synthetic_session_record,Call,Walking,5652,5652,5652,5652,5652
+synnetqos,SynNetQoS,synthetic_session_record,Gaming,Driving,502,502,502,502,502
+synnetqos,SynNetQoS,synthetic_session_record,Gaming,Static,6363,6363,6363,6363,6363
+synnetqos,SynNetQoS,synthetic_session_record,Gaming,Walking,5704,5704,5704,5704,5704
+synnetqos,SynNetQoS,synthetic_session_record,Streaming,Driving,496,496,496,496,496
+synnetqos,SynNetQoS,synthetic_session_record,Streaming,Static,6421,6421,6421,6421,6421
+synnetqos,SynNetQoS,synthetic_session_record,Streaming,Walking,5709,5709,5709,5709,5709
+vienna_4g5g,Vienna 4G/5G,drive_test,,mobile_measurement,3895145,1839718,1838818,0,0
+campus_qos,Campus QoS,controlled_testbed,,controlled,302,302,302,0,302
+ucc_5g_context,UCC 5G Context,production_trace,Amazon_Prime,Driving,37730,37730,37730,0,0
+ucc_5g_context,UCC 5G Context,production_trace,Amazon_Prime,Static,34941,34941,34941,0,0
+ucc_5g_context,UCC 5G Context,production_trace,Download,Driving,27591,27591,27591,1986,1986
+ucc_5g_context,UCC 5G Context,production_trace,Download,Static,15617,15617,15617,1222,1222
+ucc_5g_context,UCC 5G Context,production_trace,Netflix,Driving,38224,38224,38224,0,0
+ucc_5g_context,UCC 5G Context,production_trace,Netflix,Static,34608,34608,34608,0,0
+ns3_lena,5G-LENA/ns-3,controlled_simulation,qos_reference,controlled,12,12,0,12,12

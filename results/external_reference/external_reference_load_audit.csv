@@ -1,0 +1,5 @@
+source_dataset,file_name,dataset_role,status,row_count,available_column_count,missing_standard_columns,notes
+vienna_4g5g,vienna_reference_clean.csv,required,ok,3895145,14,,clean reference file loaded
+campus_qos,campus_qos_reference_clean.csv,required,ok,302,14,,clean reference file loaded
+ucc_5g_context,ucc_5g_reference_clean.csv,required,ok,188711,14,,clean reference file loaded
+ns3_lena,simulator_reference_clean.csv,required,ok,12,14,,clean reference file loaded

@@ -1,0 +1,3 @@
+metric,source_dataset,source_label,comparison_context,row_count_after_filter,filter_note
+download_throughput_mbps,ucc_5g_context,UCC 5G Context (Download context),Download context,43208,"UCC throughput comparisons use only application_context=Download. The full UCC production trace includes streaming sessions with bursty or idle bitrate periods, so the unfiltered throughput distribution is retained for coverage audit but not used as the main throughput comparison."
+upload_throughput_mbps,ucc_5g_context,UCC 5G Context (Download context),Download context,43208,UCC upload throughput is shown only for Download-context rows to avoid mixing streaming idle periods; use as supplementary evidence.
