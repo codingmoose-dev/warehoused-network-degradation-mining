@@ -1,0 +1,12 @@
+metric,value
+transaction_count,50000.0
+bubble_plot_top_n,80.0
+bubble_plot_label_n,10.0
+bubble_plot_rule_count,80.0
+bubble_plot_labeled_rule_count,10.0
+bubble_plot_min_support,0.05056
+bubble_plot_max_support,0.25936
+bubble_plot_min_confidence,0.6725
+bubble_plot_max_confidence,1.0
+bubble_plot_min_lift,1.3260115151037146
+bubble_plot_max_lift,1.9717643347267133

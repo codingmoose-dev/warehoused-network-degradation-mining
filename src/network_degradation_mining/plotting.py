@@ -76,6 +76,10 @@ VALUE_DISPLAY_NAMES = {
     "LTE_Anchor": "LTE Anchor",
     "5G NSA": "5G NSA",
     "5G SA": "5G SA",
+    "5G_NSA": "5G NSA",
+    "5G_SA": "5G SA",
+    "5g_nsa": "5G NSA",
+    "5g_sa": "5G SA",
     "4G": "4G",
     "5G": "5G",
     "High": "High",
@@ -1624,30 +1628,567 @@ def plot_clustering_analysis_outputs(
     return outputs
 
 
+def _display_association_itemset(text: Any, width: int = 44) -> str:
+    labels: list[str] = []
+    for item in str(text).split(";"):
+        item = item.strip()
+        if not item:
+            continue
+        if "=" in item:
+            field_name, value = item.split("=", 1)
+            label = f"{display_field_name(field_name)}: {display_value(value)}"
+        else:
+            label = item.replace("_", " ").title()
+        labels.append(
+            "\n".join(textwrap.wrap(label, width=width, break_long_words=False))
+        )
+    return "\n".join(labels)
+
+
+def _display_association_itemset_inline(text: Any, separator: str = " + ") -> str:
+    labels: list[str] = []
+    for item in str(text).split(";"):
+        item = item.strip()
+        if not item:
+            continue
+        if "=" in item:
+            field_name, value = item.split("=", 1)
+            label = f"{display_field_name(field_name)}: {display_value(value)}"
+        else:
+            label = item.replace("_", " ").title()
+        labels.append(label)
+    return separator.join(labels)
+
+
+def _association_antecedent_count(row: pd.Series) -> int:
+    if "antecedent_count" in row.index and pd.notna(row["antecedent_count"]):
+        return int(row["antecedent_count"])
+
+    antecedent_text = str(row.get("antecedent_text", ""))
+    return len([item for item in antecedent_text.split(";") if item.strip()])
+
+
+def _scale_marker_sizes(
+    values: pd.Series,
+    minimum_size: float = 80.0,
+    maximum_size: float = 560.0,
+) -> pd.Series:
+    numeric_values = pd.to_numeric(values, errors="coerce").fillna(0.0)
+    if numeric_values.empty:
+        return pd.Series(dtype="float64")
+
+    lower = float(numeric_values.min())
+    upper = float(numeric_values.max())
+
+    if lower == upper:
+        midpoint = (minimum_size + maximum_size) / 2.0
+        return pd.Series(midpoint, index=numeric_values.index)
+
+    scaled = (numeric_values - lower) / (upper - lower)
+    return minimum_size + scaled * (maximum_size - minimum_size)
+
+
+def _collapse_rule_algorithm_labels(data: pd.DataFrame) -> pd.DataFrame:
+    signature_columns = ["antecedent_text", "consequent_text"]
+    if data.empty or not set(signature_columns).issubset(data.columns):
+        return data
+
+    if "algorithm" not in data.columns:
+        return data.drop_duplicates(subset=signature_columns)
+
+    algorithm_map = (
+        data.groupby(signature_columns)["algorithm"]
+        .apply(lambda values: ";".join(sorted(set(values.astype(str)))))
+        .reset_index()
+    )
+
+    output = data.drop(columns=["algorithm"]).drop_duplicates(
+        subset=signature_columns
+    )
+    output = output.merge(algorithm_map, on=signature_columns, how="left")
+    return output
+
+
+def _association_rule_plot_frame(
+    degradation_rules: pd.DataFrame,
+    top_n: int,
+) -> pd.DataFrame:
+    if degradation_rules.empty:
+        return pd.DataFrame()
+
+    required_columns = {
+        "antecedent_text",
+        "consequent_text",
+        "support",
+        "confidence",
+        "lift",
+    }
+    if not required_columns.issubset(degradation_rules.columns):
+        return pd.DataFrame()
+
+    data = degradation_rules.copy()
+    data = data[data["consequent_text"].astype(str).eq("service_degraded=1")]
+    data = _collapse_rule_algorithm_labels(data)
+
+    for column in ["support", "confidence", "lift"]:
+        data[column] = pd.to_numeric(data[column], errors="coerce")
+
+    data = data.dropna(subset=["support", "confidence", "lift"])
+    if data.empty:
+        return data
+
+    data["antecedent_count"] = data.apply(_association_antecedent_count, axis=1)
+    data = data.sort_values(
+        ["lift", "confidence", "support"],
+        ascending=[False, False, False],
+    ).head(top_n)
+
+    data = data.reset_index(drop=True)
+    data.insert(0, "rule_id", [f"R{index + 1}" for index in range(len(data))])
+    data["bubble_size"] = _scale_marker_sizes(data["lift"])
+    return data
+
+
+def build_association_rule_plot_index(
+    degradation_rules: pd.DataFrame,
+    top_n: int = 40,
+    label_n: int = 0,
+    transaction_count: int | None = None,
+) -> pd.DataFrame:
+    data = _association_rule_plot_frame(degradation_rules, top_n=top_n)
+
+    columns = [
+        "rule_id",
+        "plot_rank",
+        "is_labeled_in_bubble_plot",
+        "algorithm",
+        "antecedent_text",
+        "antecedent_display",
+        "consequent_text",
+        "consequent_display",
+        "support",
+        "support_count",
+        "confidence",
+        "lift",
+        "leverage",
+        "conviction",
+        "antecedent_count",
+        "consequent_count",
+        "bubble_size",
+    ]
+
+    if data.empty:
+        return pd.DataFrame(columns=columns)
+
+    output = data.copy().reset_index(drop=True)
+    output.insert(1, "plot_rank", range(1, len(output) + 1))
+    output.insert(2, "is_labeled_in_bubble_plot", output["plot_rank"].le(label_n))
+    output["antecedent_display"] = output["antecedent_text"].map(
+        _display_association_itemset_inline
+    )
+    output["consequent_display"] = output["consequent_text"].map(
+        _display_association_itemset_inline
+    )
+
+    if transaction_count is None:
+        output["support_count"] = pd.NA
+    else:
+        output["support_count"] = (
+            pd.to_numeric(output["support"], errors="coerce") * int(transaction_count)
+        ).round().astype("Int64")
+
+    for column in ["leverage", "conviction", "consequent_count"]:
+        if column not in output.columns:
+            output[column] = pd.NA
+
+    return output[columns]
+
+
+def _association_axis_limits(
+    values: pd.Series,
+    padding_fraction: float,
+) -> tuple[float, float]:
+    numeric_values = pd.to_numeric(values, errors="coerce").dropna()
+    if numeric_values.empty:
+        return 0.0, 1.0
+
+    lower = float(numeric_values.min())
+    upper = float(numeric_values.max())
+
+    if lower == upper:
+        return lower - 0.01, upper + 0.01
+
+    padding = padding_fraction * (upper - lower)
+    return lower - padding, upper + padding
+
+
+def _association_length_style(antecedent_count: int) -> dict[str, Any]:
+    if antecedent_count <= 1:
+        return {
+            "label": "1 item",
+            "facecolor": "white",
+            "edgecolor": "#244C5A",
+            "alpha": 1.0,
+            "linewidth": 1.0,
+        }
+
+    if antecedent_count == 2:
+        return {
+            "label": "2 items",
+            "facecolor": "#8FAAB3",
+            "edgecolor": "#244C5A",
+            "alpha": 0.72,
+            "linewidth": 0.9,
+        }
+
+    return {
+        "label": "3 or more items",
+        "facecolor": "#4E7F8A",
+        "edgecolor": "#173B42",
+        "alpha": 0.78,
+        "linewidth": 0.9,
+    }
+
+
+def _bubble_size_for_lift(
+    lift_value: float,
+    lift_minimum: float,
+    lift_maximum: float,
+    minimum_size: float = 80.0,
+    maximum_size: float = 560.0,
+) -> float:
+    if lift_minimum == lift_maximum:
+        return (minimum_size + maximum_size) / 2.0
+
+    scaled = (lift_value - lift_minimum) / (lift_maximum - lift_minimum)
+    return minimum_size + scaled * (maximum_size - minimum_size)
+
+
+def _add_association_bubble_legends(
+    ax: Any,
+    data: pd.DataFrame,
+) -> tuple[Any, Any]:
+    from matplotlib.lines import Line2D
+
+    observed_lengths = sorted(data["antecedent_count"].astype(int).unique())
+    length_handles = []
+
+    for length in observed_lengths:
+        style = _association_length_style(int(length))
+        length_handles.append(
+            Line2D(
+                [0],
+                [0],
+                marker="o",
+                linestyle="",
+                markerfacecolor=style["facecolor"],
+                markeredgecolor=style["edgecolor"],
+                markeredgewidth=style["linewidth"],
+                markersize=7.5,
+                alpha=style["alpha"],
+                label=style["label"],
+            )
+        )
+
+    length_legend = ax.legend(
+        handles=length_handles,
+        title="Antecedent length",
+        frameon=True,
+        fontsize=8.0,
+        title_fontsize=8.3,
+        loc="upper left",
+        bbox_to_anchor=(1.02, 1.00),
+        borderpad=0.6,
+        labelspacing=0.55,
+    )
+    length_legend.get_frame().set_edgecolor("0.72")
+    length_legend.get_frame().set_linewidth(0.7)
+    length_legend.get_frame().set_facecolor("white")
+    ax.add_artist(length_legend)
+
+    lift_minimum = float(data["lift"].min())
+    lift_maximum = float(data["lift"].max())
+    lift_values = sorted(
+        {
+            round(lift_minimum, 2),
+            round(float(data["lift"].median()), 2),
+            round(lift_maximum, 2),
+        }
+    )
+
+    size_handles = []
+    for lift_value in lift_values:
+        marker_size = _bubble_size_for_lift(
+            lift_value,
+            lift_minimum,
+            lift_maximum,
+        )
+        size_handles.append(
+            Line2D(
+                [0],
+                [0],
+                marker="o",
+                linestyle="",
+                markerfacecolor="0.72",
+                markeredgecolor="0.35",
+                markeredgewidth=0.8,
+                markersize=min(marker_size**0.5 * 0.72, 15.0),
+                alpha=0.65,
+                label=f"{lift_value:.2f}",
+            )
+        )
+
+    size_legend = ax.legend(
+        handles=size_handles,
+        title="Lift",
+        frameon=True,
+        fontsize=8.0,
+        title_fontsize=8.3,
+        loc="upper left",
+        bbox_to_anchor=(1.02, 0.56),
+        borderpad=0.6,
+        labelspacing=1.10,
+    )
+    size_legend.get_frame().set_edgecolor("0.72")
+    size_legend.get_frame().set_linewidth(0.7)
+    size_legend.get_frame().set_facecolor("white")
+    return length_legend, size_legend
+
+
+def _annotate_association_rule_labels(
+    ax: Any,
+    data: pd.DataFrame,
+    label_n: int,
+) -> tuple[Any, ...]:
+    if label_n <= 0 or "rule_id" not in data.columns:
+        return tuple()
+
+    label_frame = data.sort_values(
+        ["lift", "confidence", "support"],
+        ascending=[False, False, False],
+    ).head(label_n)
+
+    offsets = [
+        (7, 7),
+        (7, -10),
+        (-22, 7),
+        (-22, -10),
+        (10, 16),
+        (-30, 16),
+        (10, -18),
+        (-30, -18),
+        (0, 24),
+        (0, -26),
+    ]
+
+    annotations: list[Any] = []
+    for label_index, (_, row) in enumerate(label_frame.iterrows()):
+        x_offset, y_offset = offsets[label_index % len(offsets)]
+        annotation = ax.annotate(
+            str(row["rule_id"]),
+            xy=(float(row["support"]), float(row["confidence"])),
+            xytext=(x_offset, y_offset),
+            textcoords="offset points",
+            ha="left" if x_offset >= 0 else "right",
+            va="bottom" if y_offset >= 0 else "top",
+            fontsize=7.5,
+            color="0.08",
+            bbox={
+                "boxstyle": "round,pad=0.18",
+                "facecolor": "white",
+                "edgecolor": "0.45",
+                "linewidth": 0.4,
+                "alpha": 0.90,
+            },
+            arrowprops={
+                "arrowstyle": "-",
+                "color": "0.35",
+                "linewidth": 0.45,
+                "shrinkA": 0,
+                "shrinkB": 4,
+            },
+            zorder=4,
+            clip_on=False,
+        )
+        annotations.append(annotation)
+
+    return tuple(annotations)
+
+
+def plot_rule_quality_bubble_plot(
+    degradation_rules: pd.DataFrame,
+    path: str | Path,
+    top_n: int = 40,
+    label_n: int = 0,
+) -> Path:
+    output_path = ensure_figure_parent(path)
+    data = _association_rule_plot_frame(degradation_rules, top_n=top_n)
+
+    if data.empty:
+        fig, ax = plt.subplots(figsize=(7.0, 3.0))
+        ax.axis("off")
+        ax.text(
+            0.5,
+            0.5,
+            "No selected degradation rules",
+            ha="center",
+            va="center",
+            fontsize=9,
+        )
+        output_path = save_figure(fig, output_path)
+        plt.close(fig)
+        return output_path
+
+    fig, ax = plt.subplots(figsize=(8.6, 5.2))
+
+    for antecedent_count in sorted(data["antecedent_count"].astype(int).unique()):
+        subset = data[data["antecedent_count"].astype(int).eq(antecedent_count)]
+        style = _association_length_style(int(antecedent_count))
+
+        ax.scatter(
+            subset["support"],
+            subset["confidence"],
+            s=subset["bubble_size"],
+            facecolors=style["facecolor"],
+            edgecolors=style["edgecolor"],
+            linewidths=style["linewidth"],
+            alpha=style["alpha"],
+            zorder=2,
+        )
+
+    x_min, x_max = _association_axis_limits(data["support"], 0.08)
+    y_min, y_max = _association_axis_limits(data["confidence"], 0.08)
+
+    ax.set_xlim(max(0.0, x_min), x_max)
+    ax.set_ylim(max(0.0, y_min), min(1.03, y_max))
+    ax.set_xlabel("Support")
+    ax.set_ylabel("Confidence")
+
+    ax.grid(True, linewidth=0.45, alpha=0.38)
+    ax.set_axisbelow(True)
+    ax.tick_params(axis="both", labelsize=8.8)
+    ax.spines["top"].set_visible(False)
+    ax.spines["right"].set_visible(False)
+
+    label_artists = _annotate_association_rule_labels(ax, data, label_n)
+    legend_artists = _add_association_bubble_legends(ax, data)
+    extra_artists = (*label_artists, *legend_artists)
+
+    fig.subplots_adjust(left=0.10, right=0.76, bottom=0.13, top=0.96)
+    temporary_path = output_path.with_name(
+        f".{output_path.stem}.tmp{output_path.suffix}"
+    )
+    fig.savefig(
+        temporary_path,
+        bbox_inches="tight",
+        bbox_extra_artists=extra_artists,
+        pad_inches=0.08,
+    )
+    temporary_path.replace(output_path)
+    plt.close(fig)
+    return output_path
+
+
 def plot_top_association_rules(
     degradation_rules: pd.DataFrame,
     path: str | Path,
     top_n: int = 20,
 ) -> Path:
-    fig, ax = plt.subplots(figsize=(9.0, 7.0))
+    output_path = ensure_figure_parent(path)
 
-    if not degradation_rules.empty:
-        data = degradation_rules.sort_values(
-            ["lift", "confidence", "support"],
-            ascending=[False, False, False],
-        ).head(top_n)
-        data = data.sort_values("lift", ascending=True)
+    if degradation_rules.empty:
+        fig, ax = plt.subplots(figsize=(7.0, 3.0))
+        ax.axis("off")
+        ax.text(
+            0.5,
+            0.5,
+            "No selected degradation rules",
+            ha="center",
+            va="center",
+            fontsize=9,
+        )
+        output_path = save_figure(fig, output_path)
+        plt.close(fig)
+        return output_path
 
-        labels = [
-            text.replace(";", "\n")
-            for text in data["antecedent_text"].astype(str).tolist()
-        ]
-        ax.barh(labels, data["lift"])
-        ax.set_xlabel("Lift")
-        ax.set_ylabel("Antecedent itemset")
+    data = degradation_rules.copy()
+    if "consequent_text" in data.columns:
+        data = data[data["consequent_text"].astype(str).eq("service_degraded=1")]
 
-    ax.grid(True, axis="x", linewidth=0.4, alpha=0.5)
-    output_path = save_figure(fig, path)
+    data = _collapse_rule_algorithm_labels(data)
+    for column in ["support", "confidence", "lift"]:
+        data[column] = pd.to_numeric(data[column], errors="coerce")
+
+    data = data.dropna(subset=["support", "confidence", "lift"])
+    data = data.sort_values(
+        ["lift", "confidence", "support"],
+        ascending=[False, False, False],
+    ).head(top_n)
+
+    if data.empty:
+        fig, ax = plt.subplots(figsize=(7.0, 3.0))
+        ax.axis("off")
+        ax.text(
+            0.5,
+            0.5,
+            "No selected degradation rules",
+            ha="center",
+            va="center",
+            fontsize=9,
+        )
+        output_path = save_figure(fig, output_path)
+        plt.close(fig)
+        return output_path
+
+    data = data.sort_values("lift", ascending=True)
+    labels = [
+        _display_association_itemset(text)
+        for text in data["antecedent_text"].astype(str).tolist()
+    ]
+
+    baseline = 1.0
+    fig_height = max(4.8, 0.55 * len(data) + 1.4)
+    fig, ax = plt.subplots(figsize=(9.2, fig_height))
+
+    lift_values = data["lift"].astype(float)
+    ax.barh(
+        labels,
+        lift_values - baseline,
+        left=baseline,
+        color=MODEL_COMPARISON_BLUE,
+        edgecolor=MODEL_COMPARISON_BLUE,
+        linewidth=0.4,
+    )
+
+    for position, value in enumerate(lift_values):
+        ax.text(
+            float(value) + 0.01,
+            position,
+            f"{float(value):.2f}",
+            va="center",
+            fontsize=8.4,
+            color="0.10",
+        )
+
+    x_max = max(1.1, float(lift_values.max()) + 0.08)
+    ax.axvline(
+        baseline,
+        color="0.35",
+        linewidth=0.8,
+        linestyle=(0, (4, 4)),
+        zorder=0,
+    )
+    ax.set_xlabel("Lift")
+    ax.set_ylabel("Antecedent itemset")
+    ax.set_xlim(baseline, x_max)
+    ax.grid(True, axis="x", linewidth=0.4, alpha=0.45)
+    ax.set_axisbelow(True)
+    ax.tick_params(axis="y", length=0)
+    ax.spines["top"].set_visible(False)
+    ax.spines["right"].set_visible(False)
+
+    fig.tight_layout()
+    output_path = save_figure(fig, output_path)
     plt.close(fig)
     return output_path
 
