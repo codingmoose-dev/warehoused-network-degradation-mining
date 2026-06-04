@@ -1,0 +1,2 @@
+selected_k,seed_count,mean_pairwise_adjusted_rand_index,min_pairwise_adjusted_rand_index,max_pairwise_adjusted_rand_index,mean_degradation_rate_range
+2,8,0.9978618852880997,0.9944207668420417,1.0,0.6094847322930598

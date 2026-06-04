@@ -1,7 +1,8 @@
-pandas
-pyyaml
-pyarrow
 matplotlib
+mlxtend
+pandas
+pyarrow
+pyyaml
 scikit-learn
-xgboost
 scipy
+xgboost

@@ -1,0 +1,59 @@
+feature_context: full_context
+criterion: gini
+train_rows: 40000
+test_rows: 10000
+numeric_feature_count: 31
+categorical_feature_count: 16
+transformed_feature_count: 103
+tree_depth: 4
+leaf_count: 16
+test_balanced_accuracy: 0.929677
+test_f1: 0.930348
+threshold_note: tree text below uses transformed model inputs; see tree_leaf_rule_table.csv rule_text_interpretable for raw-scale/interpretable conditions.
+
+|--- link_capacity_downlink_mbps <= -0.4828
+|   |--- link_capacity_downlink_mbps <= -0.6077
+|   |   |--- app_type_Call <= 0.5000
+|   |   |   |--- offered_downlink_mbps <= -0.4713
+|   |   |   |   |--- weights: [138.3309, 2938.4865] class: 1
+|   |   |   |--- offered_downlink_mbps >  -0.4713
+|   |   |   |   |--- weights: [3.0514, 8108.3739] class: 1
+|   |   |--- app_type_Call >  0.5000
+|   |   |   |--- link_capacity_upload_mbps <= -0.6156
+|   |   |   |   |--- weights: [152.5708, 2750.6515] class: 1
+|   |   |   |--- link_capacity_upload_mbps >  -0.6156
+|   |   |   |   |--- weights: [339.7244, 438.6094] class: 1
+|   |--- link_capacity_downlink_mbps >  -0.6077
+|   |   |--- offered_downlink_mbps <= -0.3418
+|   |   |   |--- network_type_5G NSA <= 0.5000
+|   |   |   |   |--- weights: [1414.8401, 447.4603] class: 0
+|   |   |   |--- network_type_5G NSA >  0.5000
+|   |   |   |   |--- weights: [277.6789, 452.3774] class: 1
+|   |   |--- offered_downlink_mbps >  -0.3418
+|   |   |   |--- offered_downlink_mbps <= -0.2635
+|   |   |   |   |--- weights: [54.9255, 162.2658] class: 1
+|   |   |   |--- offered_downlink_mbps >  -0.2635
+|   |   |   |   |--- weights: [8.1371, 1624.6251] class: 1
+|--- link_capacity_downlink_mbps >  -0.4828
+|   |--- offered_downlink_mbps <= 0.6342
+|   |   |--- link_capacity_downlink_mbps <= -0.2447
+|   |   |   |--- offered_downlink_mbps <= -0.0291
+|   |   |   |   |--- weights: [3030.0565, 510.3998] class: 0
+|   |   |   |--- offered_downlink_mbps >  -0.0291
+|   |   |   |   |--- weights: [72.2169, 568.4221] class: 1
+|   |   |--- link_capacity_downlink_mbps >  -0.2447
+|   |   |   |--- link_capacity_downlink_mbps <= -0.1676
+|   |   |   |   |--- weights: [758.7855, 81.6246] class: 0
+|   |   |   |--- link_capacity_downlink_mbps >  -0.1676
+|   |   |   |   |--- weights: [12227.0254, 75.7240] class: 0
+|   |--- offered_downlink_mbps >  0.6342
+|   |   |--- link_capacity_downlink_mbps <= 0.4681
+|   |   |   |--- link_capacity_downlink_mbps <= 0.1993
+|   |   |   |   |--- weights: [53.9084, 1322.7123] class: 1
+|   |   |   |--- link_capacity_downlink_mbps >  0.1993
+|   |   |   |   |--- weights: [149.5194, 245.8573] class: 1
+|   |   |--- link_capacity_downlink_mbps >  0.4681
+|   |   |   |--- offered_downlink_mbps <= 2.5810
+|   |   |   |   |--- weights: [1130.0412, 36.3869] class: 0
+|   |   |   |--- offered_downlink_mbps >  2.5810
+|   |   |   |   |--- weights: [189.1878, 236.0230] class: 1

@@ -1,0 +1,5 @@
+feature_block,method,k,row_count,cluster_count,noise_fraction,minimum_cluster_fraction,inertia,eps,min_samples,fit_scope,silhouette_score,davies_bouldin_score,calinski_harabasz_score,min_cluster_size
+reduced_context,optics,,4000,1,0.0,1.0,,,10,bounded_sample,,,,80.0
+reduced_context,optics,,4000,1,0.0,1.0,,,25,bounded_sample,,,,80.0
+reduced_context,optics,,4000,1,0.0,1.0,,,50,bounded_sample,,,,80.0
+reduced_context,optics,,4000,1,0.0,1.0,,,100,bounded_sample,,,,80.0

@@ -1,0 +1,59 @@
+feature_context: reduced_context
+criterion: gini
+train_rows: 40000
+test_rows: 10000
+numeric_feature_count: 27
+categorical_feature_count: 15
+transformed_feature_count: 93
+tree_depth: 4
+leaf_count: 16
+test_balanced_accuracy: 0.863460
+test_f1: 0.861937
+threshold_note: tree text below uses transformed model inputs; see tree_leaf_rule_table.csv rule_text_interpretable for raw-scale/interpretable conditions.
+
+|--- signal_strength_unclipped_dbm <= -0.1508
+|   |--- signal_strength_dbm <= -0.5615
+|   |   |--- app_type_Call <= 0.5000
+|   |   |   |--- data_usage_mb <= -0.3939
+|   |   |   |   |--- weights: [81.3711, 7735.6542] class: 1
+|   |   |   |--- data_usage_mb >  -0.3939
+|   |   |   |   |--- weights: [193.2564, 844.7657] class: 1
+|   |   |--- app_type_Call >  0.5000
+|   |   |   |--- data_usage_mb <= -0.5262
+|   |   |   |   |--- weights: [138.3309, 1730.8354] class: 1
+|   |   |   |--- data_usage_mb >  -0.5262
+|   |   |   |   |--- weights: [466.8667, 541.8695] class: 1
+|   |--- signal_strength_dbm >  -0.5615
+|   |   |--- congestion_level_High <= 0.5000
+|   |   |   |--- network_type_4G <= 0.5000
+|   |   |   |   |--- weights: [1925.4437, 1042.4350] class: 0
+|   |   |   |--- network_type_4G >  0.5000
+|   |   |   |   |--- weights: [120.0224, 889.0200] class: 1
+|   |   |--- congestion_level_High >  0.5000
+|   |   |   |--- network_type_5G SA <= 0.5000
+|   |   |   |   |--- weights: [0.0000, 1629.5422] class: 1
+|   |   |   |--- network_type_5G SA >  0.5000
+|   |   |   |   |--- weights: [269.5418, 610.7095] class: 1
+|--- signal_strength_unclipped_dbm >  -0.1508
+|   |--- congestion_level_High <= 0.5000
+|   |   |--- network_type_4G <= 0.5000
+|   |   |   |--- app_type_Streaming <= 0.5000
+|   |   |   |   |--- weights: [7338.6564, 121.9452] class: 0
+|   |   |   |--- app_type_Streaming >  0.5000
+|   |   |   |   |--- weights: [2119.7172, 385.5043] class: 0
+|   |   |--- network_type_4G >  0.5000
+|   |   |   |--- signal_strength_dbm <= 0.2706
+|   |   |   |   |--- weights: [392.6156, 664.7982] class: 1
+|   |   |   |--- signal_strength_dbm >  0.2706
+|   |   |   |   |--- weights: [2130.9058, 306.8299] class: 0
+|   |--- congestion_level_High >  0.5000
+|   |   |--- signal_strength_unclipped_dbm <= 0.3394
+|   |   |   |--- network_type_5G SA <= 0.5000
+|   |   |   |   |--- weights: [149.5194, 1831.1452] class: 1
+|   |   |   |--- network_type_5G SA >  0.5000
+|   |   |   |   |--- weights: [770.9912, 313.7139] class: 0
+|   |   |--- signal_strength_unclipped_dbm >  0.3394
+|   |   |   |--- network_type_4G <= 0.5000
+|   |   |   |   |--- weights: [3403.3464, 570.3889] class: 0
+|   |   |   |--- network_type_4G >  0.5000
+|   |   |   |   |--- weights: [499.4151, 780.8428] class: 1

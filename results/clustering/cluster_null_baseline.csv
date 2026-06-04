@@ -1,0 +1,2 @@
+feature_block,method,cluster_count,observed_degradation_rate_gap,random_gap_mean,random_gap_std,random_gap_p95,random_gap_p99,empirical_p_value_random_gap_ge_observed,replications
+reduced_context,kmeans,2,0.589460746710917,0.003759394577193465,0.002796854799671662,0.009107733790034475,0.012393803349410204,0.000999000999000999,1000
