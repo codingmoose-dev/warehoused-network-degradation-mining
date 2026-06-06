@@ -1,0 +1,2 @@
+community_id,node_count,edge_count,mean_degradation_rate,max_degradation_lift,top_context_values
+community_0001,39,657,0.5326153806468223,1.82388200962221,application=Browse; application=Call; application=Gaming; application=Streaming; area_type=Urban; congestion=High; congestion=Low; congestion=Medium

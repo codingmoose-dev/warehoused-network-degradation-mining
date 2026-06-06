@@ -1,0 +1,14 @@
+check_name,check_value,status
+node_count_positive,55318,ok
+edge_count_positive,645935,ok
+duplicate_node_id_count,0,ok
+duplicate_edge_id_count,0,ok
+edge_endpoint_missing_node_count,0,ok
+external_rows_are_reference_evidence_only,1,ok
+graph_view_policy,warehouse_measurement=SynNetQoS labeled records; context_cooccurrence=SynNetQoS context signatures; external_reference_evidence=reference-only evidence,ok
+context_cooccurrence_node_count,39,ok
+context_cooccurrence_edge_count,657,ok
+external_reference_evidence_node_count,240,ok
+external_reference_evidence_edge_count,278,ok
+warehouse_measurement_node_count,55039,ok
+warehouse_measurement_edge_count,645000,ok

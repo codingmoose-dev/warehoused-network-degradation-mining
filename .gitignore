@@ -47,3 +47,7 @@ data/interim/
 
 # Local notebooks
 notebooks/exploratory_only/
+
+# Large generated graph edge tables
+data/processed/graph/edges/all_edges.csv
+data/processed/graph/edges/warehouse_context_edges.csv

@@ -1,0 +1,17 @@
+artifact_name,artifact_type,relative_path,row_count
+graph_build_audit,audit_table,results/graph/graph_build_audit.csv,13
+all_edges,edge_table,data/processed/graph/edges/all_edges.csv,645935
+context_cooccurrence_edges,edge_table,data/processed/graph/edges/context_cooccurrence_edges.csv,657
+external_reference_edges,edge_table,data/processed/graph/edges/external_reference_edges.csv,278
+warehouse_context_edges,edge_table,data/processed/graph/edges/warehouse_context_edges.csv,550000
+warehouse_membership_edges,edge_table,data/processed/graph/edges/warehouse_membership_edges.csv,50000
+warehouse_transition_edges,edge_table,data/processed/graph/edges/warehouse_transition_edges.csv,45000
+all_nodes,node_table,data/processed/graph/nodes/all_nodes.csv,55318
+context_value_nodes,node_table,data/processed/graph/nodes/context_value_nodes.csv,39
+external_comparison_nodes,node_table,data/processed/graph/nodes/external_comparison_nodes.csv,12
+external_context_nodes,node_table,data/processed/graph/nodes/external_context_nodes.csv,216
+external_metric_nodes,node_table,data/processed/graph/nodes/external_metric_nodes.csv,7
+external_source_nodes,node_table,data/processed/graph/nodes/external_source_nodes.csv,5
+warehouse_context_nodes,node_table,data/processed/graph/nodes/warehouse_context_nodes.csv,39
+warehouse_measurement_nodes,node_table,data/processed/graph/nodes/warehouse_measurement_nodes.csv,50000
+warehouse_session_nodes,node_table,data/processed/graph/nodes/warehouse_session_nodes.csv,5000

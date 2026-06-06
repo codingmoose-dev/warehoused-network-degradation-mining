@@ -1,0 +1,6 @@
+node_id,node_type,graph_view,node_label,source_dataset,source_label,source_role,row_count
+external_reference_evidence:source:campus_qos:7d40f1cbee10,source,external_reference_evidence,Campus QoS,campus_qos,Campus QoS,reference_dataset,302
+external_reference_evidence:source:ns3_lena:159e140fa99f,source,external_reference_evidence,5G-LENA/ns-3,ns3_lena,5G-LENA/ns-3,controlled_reference,12
+external_reference_evidence:source:synnetqos:a81eefc24311,source,external_reference_evidence,SynNetQoS,synnetqos,SynNetQoS,main_dataset,50000
+external_reference_evidence:source:ucc_5g_context:3bfe5e5f2660,source,external_reference_evidence,UCC 5G Context,ucc_5g_context,UCC 5G Context,reference_dataset,188711
+external_reference_evidence:source:vienna_4g5g:9718c68f019b,source,external_reference_evidence,Vienna 4G/5G,vienna_4g5g,Vienna 4G/5G,reference_dataset,3895145

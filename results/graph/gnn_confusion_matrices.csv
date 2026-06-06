@@ -1,0 +1,13 @@
+model_name,actual_class,predicted_class,count
+graph_context_logistic_regression,0,0,3676
+graph_context_logistic_regression,0,1,1303
+graph_context_logistic_regression,1,0,1240
+graph_context_logistic_regression,1,1,3781
+graphsage_transition_gnn,0,0,3611
+graphsage_transition_gnn,0,1,1368
+graphsage_transition_gnn,1,0,1169
+graphsage_transition_gnn,1,1,3852
+gcn_transition_gnn,0,0,3418
+gcn_transition_gnn,0,1,1561
+gcn_transition_gnn,1,0,1359
+gcn_transition_gnn,1,1,3662

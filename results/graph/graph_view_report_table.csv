@@ -1,0 +1,4 @@
+graph_view,node_count,edge_count,scientific_role,prediction_role,recommended_reporting_use
+context_cooccurrence,39,657,Compact operating-context co-occurrence graph for degradation signatures,Supports graph mining and graph-derived feature construction,Main text table and primary graph-mining evidence
+external_reference_evidence,240,278,"Reference-source, metric, context, and comparison-evidence graph",Reference-only; excluded from supervised prediction,Main text table or supplement depending on page budget
+warehouse_measurement,55039,645000,"Warehouse record, session, context, and transition structure",Eligible for warehouse-only prediction and transition analysis,Main text table

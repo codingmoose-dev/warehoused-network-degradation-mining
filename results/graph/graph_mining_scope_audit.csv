@@ -1,0 +1,4 @@
+graph_view,mining_role,prediction_role,node_count,edge_count,status
+warehouse_measurement,warehouse_schema_and_transition_analysis,prediction_eligible,55039,645000,ok
+context_cooccurrence,context_cooccurrence_degradation_signature_mining,prediction_feature_support,39,657,ok
+external_reference_evidence,external_reference_evidence_organization,reference_only,240,278,ok
