@@ -2314,3 +2314,1066 @@ def plot_external_metric_distribution(
     save_figure(fig, output_path)
     plt.close(fig)
     return output_path
+
+
+GRAPH_MODEL_DISPLAY_NAMES = {
+    "graph_context_logistic_regression": "Graph-context logistic regression",
+    "graphsage_transition_gnn": "GraphSAGE transition GNN",
+    "gcn_transition_gnn": "GCN transition GNN",
+}
+
+
+def display_graph_model_name(name: Any) -> str:
+    text = str(name).strip()
+    if text in GRAPH_MODEL_DISPLAY_NAMES:
+        return GRAPH_MODEL_DISPLAY_NAMES[text]
+    return display_model_name(text)
+
+
+def _graph_node_label_map(nodes: pd.DataFrame) -> dict[str, str]:
+    if nodes.empty or "node_id" not in nodes.columns:
+        return {}
+    label_column = "node_label" if "node_label" in nodes.columns else "node_id"
+    return dict(zip(nodes["node_id"].astype(str), nodes[label_column].astype(str)))
+
+
+def plot_context_pair_evidence_matrix(
+    evidence_matrix: pd.DataFrame,
+    figure_path: str | Path,
+) -> Path | None:
+    if evidence_matrix.empty:
+        return None
+    required = {
+        "context_pair_label",
+        "row_count",
+        "support_fraction",
+        "degradation_rate",
+        "degradation_lift",
+    }
+    if not required.issubset(evidence_matrix.columns):
+        return None
+
+    plot_frame = evidence_matrix.copy().sort_values("main_text_rank", ascending=True)
+    metrics = [
+        ("degradation_rate", "Degradation\nrate"),
+        ("degradation_lift", "Lift"),
+        ("support_fraction", "Support"),
+        ("row_count", "Rows"),
+    ]
+    normalised = {}
+    for column, _label in metrics:
+        values = pd.to_numeric(plot_frame[column], errors="coerce").fillna(0.0)
+        maximum = float(values.max()) if float(values.max()) > 0 else 1.0
+        normalised[column] = values / maximum
+
+    row_count = len(plot_frame)
+    fig_height = max(5.6, 0.46 * row_count + 2.4)
+    fig, ax = plt.subplots(figsize=(10.7, fig_height))
+    x_positions = list(range(len(metrics)))
+
+    for y_index, (_, row) in enumerate(plot_frame.iterrows()):
+        wrapped_label = "\n".join(
+            textwrap.wrap(
+                str(row["context_pair_label"]),
+                width=42,
+                break_long_words=False,
+            )
+        )
+        ax.text(-0.55, y_index, wrapped_label, ha="right", va="center", fontsize=8.4)
+        for x_index, (column, _label) in enumerate(metrics):
+            scaled = float(normalised[column].iloc[y_index])
+            size = 95.0 + 520.0 * scaled
+            ax.scatter(
+                x_index,
+                y_index,
+                s=size,
+                color="0.86",
+                edgecolors="0.25",
+                alpha=0.92,
+                linewidth=0.75,
+            )
+            value = row[column]
+            if column == "row_count":
+                label = f"{int(value):,}"
+            elif column == "degradation_lift":
+                label = f"{float(value):.2f}×"
+            else:
+                label = f"{float(value):.3f}"
+            ax.text(x_index, y_index, label, ha="center", va="center", fontsize=7.2)
+
+    ax.set_xticks(x_positions)
+    ax.set_xticklabels([label for _, label in metrics], fontsize=8.8)
+    ax.set_yticks([])
+    ax.set_xlim(-0.85, len(metrics) - 0.35)
+    ax.set_ylim(row_count - 0.45, -1.25)
+    ax.grid(axis="x", linestyle="--", linewidth=0.45, alpha=0.35)
+    ax.tick_params(axis="x", length=0)
+    for spine in ax.spines.values():
+        spine.set_visible(False)
+
+    ax.text(
+        -0.55,
+        -1.05,
+        "Context pair",
+        ha="right",
+        va="center",
+        fontsize=8.8,
+        fontweight="bold",
+    )
+    fig.subplots_adjust(left=0.43, right=0.97, bottom=0.05, top=0.90)
+
+    output_path = ensure_figure_parent(figure_path)
+    save_figure(fig, output_path)
+    plt.close(fig)
+    return output_path
+
+
+def plot_top_degradation_context_pair_lift(
+    evidence_matrix: pd.DataFrame,
+    figure_path: str | Path,
+    top_n: int = 10,
+) -> Path | None:
+    required = {
+        "context_pair_label",
+        "row_count",
+        "degradation_rate",
+        "baseline_degradation_rate",
+        "degradation_lift",
+    }
+    if evidence_matrix.empty or not required.issubset(evidence_matrix.columns):
+        return None
+
+    plot_frame = evidence_matrix.copy()
+    numeric_columns = [
+        "row_count",
+        "degradation_rate",
+        "baseline_degradation_rate",
+        "degradation_lift",
+    ]
+    if "support_fraction" in plot_frame.columns:
+        numeric_columns.append("support_fraction")
+    else:
+        plot_frame["support_fraction"] = np.nan
+
+    for column in numeric_columns:
+        plot_frame[column] = pd.to_numeric(plot_frame[column], errors="coerce")
+
+    plot_frame = plot_frame.dropna(subset=["degradation_lift"])
+    plot_frame = plot_frame.sort_values(
+        ["degradation_lift", "degradation_rate", "row_count"],
+        ascending=False,
+    ).head(top_n)
+    if plot_frame.empty:
+        return None
+
+    plot_frame = plot_frame.sort_values("degradation_lift", ascending=True)
+    labels = [
+        "\n".join(textwrap.wrap(str(value), width=36, break_long_words=False))
+        for value in plot_frame["context_pair_label"]
+    ]
+
+    y_positions = list(range(len(plot_frame)))
+    fig_height = max(5.0, 0.50 * len(plot_frame) + 1.8)
+    fig = plt.figure(figsize=(12.0, fig_height))
+    grid = fig.add_gridspec(1, 2, width_ratios=[4.7, 1.9], wspace=0.04)
+    ax = fig.add_subplot(grid[0, 0])
+    table_ax = fig.add_subplot(grid[0, 1])
+
+    lift_values = plot_frame["degradation_lift"].astype(float)
+    lift_min = float(lift_values.min())
+    lift_max = float(lift_values.max())
+    x_origin = 1.0 if lift_min >= 1.0 else 0.0
+    bar_widths = lift_values - x_origin
+
+    ax.barh(
+        y_positions,
+        bar_widths,
+        left=x_origin,
+        color=MODEL_COMPARISON_BLUE,
+        edgecolor=MODEL_COMPARISON_BLUE,
+        linewidth=0.45,
+        alpha=1.0,
+    )
+
+    for position, (_, row) in enumerate(plot_frame.iterrows()):
+        lift = float(row["degradation_lift"])
+        ax.text(
+            lift + 0.012,
+            position,
+            f"{lift:.2f}×",
+            ha="left",
+            va="center",
+            fontsize=8.3,
+            color="0.08",
+        )
+
+    baseline_rate = float(plot_frame["baseline_degradation_rate"].median())
+
+    ax.set_xlim(x_origin, lift_max + 0.20)
+    ax.set_yticks(y_positions)
+    ax.set_yticklabels(labels, fontsize=8.6)
+    ax.set_xlabel("Degradation lift relative to overall baseline")
+    ax.set_ylabel("")
+    ax.set_ylim(-0.7, len(plot_frame) - 0.25)
+    ax.axvline(x_origin, color="0.20", linewidth=0.8)
+    ax.grid(axis="x", linestyle="--", linewidth=0.5, alpha=0.42)
+    ax.tick_params(axis="y", length=0)
+    ax.spines["top"].set_visible(False)
+    ax.spines["right"].set_visible(False)
+    ax.spines["left"].set_visible(False)
+
+    table_ax.set_xlim(0.0, 1.0)
+    table_ax.set_ylim(ax.get_ylim())
+    table_ax.set_xticks([])
+    table_ax.set_yticks([])
+    for spine in table_ax.spines.values():
+        spine.set_visible(False)
+
+    column_positions = [0.15, 0.52, 0.89]
+    headers = ["Rows\n(n)", "Support\nfraction", "Degradation\nrate"]
+    header_y = len(plot_frame) - 0.05
+
+    for x_pos, header in zip(column_positions, headers):
+        table_ax.text(
+            x_pos,
+            header_y,
+            header,
+            ha="center",
+            va="bottom",
+            fontsize=8.2,
+            fontweight="bold",
+            color="0.08",
+            linespacing=1.05,
+        )
+
+    for position, (_, row) in enumerate(plot_frame.iterrows()):
+        rows = int(row["row_count"])
+        support_value = row.get("support_fraction", np.nan)
+        support_label = "—" if pd.isna(support_value) else f"{float(support_value):.3f}"
+
+        values = [
+            f"n={rows:,}",
+            support_label,
+            f"{float(row['degradation_rate']):.3f}",
+        ]
+
+        for x_pos, value in zip(column_positions, values):
+            table_ax.text(
+                x_pos,
+                position,
+                value,
+                ha="center",
+                va="center",
+                fontsize=8.4,
+                color="0.08",
+            )
+
+        table_ax.hlines(
+            position + 0.5,
+            0.02,
+            0.98,
+            color="0.86",
+            linestyle=(0, (1.2, 2.4)),
+            linewidth=0.45,
+            zorder=0,
+        )
+
+    fig.text(
+        0.105,
+        0.028,
+        f"Baseline degradation rate across all records: {baseline_rate:.3f}",
+        ha="left",
+        va="bottom",
+        fontsize=8.2,
+        color="0.20",
+    )
+
+    fig.subplots_adjust(left=0.31, right=0.985, bottom=0.13, top=0.90)
+
+    output_path = ensure_figure_parent(figure_path)
+    save_figure(fig, output_path)
+    plt.close(fig)
+    return output_path
+
+
+def _draw_schema_box(
+    ax: Any,
+    center_x: float,
+    center_y: float,
+    width: float,
+    height: float,
+    title: str,
+    lines: list[str],
+) -> None:
+    from matplotlib.patches import FancyBboxPatch
+
+    left = center_x - width / 2.0
+    bottom = center_y - height / 2.0
+    patch = FancyBboxPatch(
+        (left, bottom),
+        width,
+        height,
+        boxstyle="round,pad=0.018,rounding_size=0.02",
+        linewidth=1.05,
+        edgecolor="0.18",
+        facecolor="white",
+        zorder=2,
+    )
+    ax.add_patch(patch)
+    ax.text(
+        center_x,
+        center_y + height * 0.29,
+        title,
+        ha="center",
+        va="center",
+        fontsize=9.6,
+        fontweight="bold",
+        zorder=3,
+    )
+    ax.text(
+        center_x,
+        center_y - height * 0.08,
+        "\n".join(lines),
+        ha="center",
+        va="center",
+        fontsize=7.6,
+        linespacing=1.25,
+        zorder=3,
+    )
+
+
+def _schema_arrow(
+    ax: Any,
+    start: tuple[float, float],
+    end: tuple[float, float],
+    label: str | None = None,
+) -> None:
+    ax.annotate(
+        "",
+        xy=end,
+        xytext=start,
+        arrowprops={
+            "arrowstyle": "-|>",
+            "lw": 1.0,
+            "color": "0.18",
+            "shrinkA": 0,
+            "shrinkB": 0,
+            "mutation_scale": 9,
+        },
+        zorder=1,
+    )
+    if label:
+        label_x = (start[0] + end[0]) / 2.0
+        label_y = (start[1] + end[1]) / 2.0 + 0.025
+        ax.text(
+            label_x,
+            label_y,
+            label,
+            ha="center",
+            va="bottom",
+            fontsize=7.2,
+            color="0.25",
+            bbox={
+                "boxstyle": "round,pad=0.18",
+                "facecolor": "white",
+                "edgecolor": "none",
+            },
+            zorder=4,
+        )
+
+
+def plot_graph_schema(figure_path: str | Path) -> Path:
+    fig, ax = plt.subplots(figsize=(12.0, 5.0))
+    row_y_positions = [0.74, 0.50, 0.26]
+    box_height = 0.16
+    view_x = 0.17
+    construction_x = 0.50
+    output_x = 0.83
+    box_width = 0.25
+
+    column_headers = [
+        (view_x, "Graph view"),
+        (construction_x, "Graph construction"),
+        (output_x, "Output role"),
+    ]
+    for x_pos, header in column_headers:
+        ax.text(
+            x_pos,
+            0.92,
+            header,
+            ha="center",
+            va="center",
+            fontsize=9.8,
+            fontweight="bold",
+            color="0.08",
+        )
+
+    rows = [
+        {
+            "view_title": "Warehouse measurement",
+            "view_lines": ["SynNetQoS warehouse records"],
+            "construction_title": "Measurement-session graph",
+            "construction_lines": [
+                "record nodes",
+                "session/context edges",
+                "within-session transitions",
+            ],
+            "output_title": "Structure analysis",
+            "output_lines": ["transition summaries", "auxiliary graph benchmark"],
+        },
+        {
+            "view_title": "Context co-occurrence",
+            "view_lines": ["operating-context values"],
+            "construction_title": "Context-pair edge graph",
+            "construction_lines": ["row count", "degradation rate", "support and lift"],
+            "output_title": "Graph-mining evidence",
+            "output_lines": ["high-lift context pairs", "degradation signatures"],
+        },
+        {
+            "view_title": "External reference",
+            "view_lines": ["Vienna, Campus QoS, UCC, ns-3"],
+            "construction_title": "Source-metric-context graph",
+            "construction_lines": [
+                "source coverage",
+                "metric coverage",
+                "comparison context",
+            ],
+            "output_title": "Reference-only evidence",
+            "output_lines": ["excluded from prediction", "no common target merge"],
+        },
+    ]
+
+    for y_pos, row in zip(row_y_positions, rows):
+        _draw_schema_box(
+            ax,
+            view_x,
+            y_pos,
+            box_width,
+            box_height,
+            row["view_title"],
+            row["view_lines"],
+        )
+        _draw_schema_box(
+            ax,
+            construction_x,
+            y_pos,
+            box_width,
+            box_height,
+            row["construction_title"],
+            row["construction_lines"],
+        )
+        _draw_schema_box(
+            ax,
+            output_x,
+            y_pos,
+            box_width,
+            box_height,
+            row["output_title"],
+            row["output_lines"],
+        )
+        _schema_arrow(
+            ax,
+            (view_x + box_width / 2.0, y_pos),
+            (construction_x - box_width / 2.0, y_pos),
+        )
+        _schema_arrow(
+            ax,
+            (construction_x + box_width / 2.0, y_pos),
+            (output_x - box_width / 2.0, y_pos),
+        )
+
+    ax.set_xlim(0, 1)
+    ax.set_ylim(0, 1)
+    ax.set_axis_off()
+    output_path = ensure_figure_parent(figure_path)
+    save_figure(fig, output_path)
+    plt.close(fig)
+    return output_path
+
+def plot_context_degradation_graph(
+    nodes: pd.DataFrame,
+    edge_summary: pd.DataFrame,
+    figure_path: str | Path,
+) -> Path | None:
+    if nodes.empty or edge_summary.empty:
+        return None
+    plot_edges = edge_summary.head(30).copy()
+    involved = sorted(
+        set(plot_edges["source_node_id"].astype(str))
+        | set(plot_edges["target_node_id"].astype(str))
+    )
+    if not involved:
+        return None
+    labels = _graph_node_label_map(nodes)
+    radius = 1.0
+    positions = {}
+    for index, node_id in enumerate(involved):
+        angle = 2 * np.pi * index / len(involved)
+        positions[node_id] = (radius * np.cos(angle), radius * np.sin(angle))
+
+    fig, ax = plt.subplots(figsize=(8.5, 8.0))
+    max_weight = pd.to_numeric(plot_edges["row_count"], errors="coerce").max()
+    max_weight = float(max_weight) if pd.notna(max_weight) and max_weight else 1.0
+    for row in plot_edges.itertuples(index=False):
+        data = row._asdict()
+        source = str(data["source_node_id"])
+        target = str(data["target_node_id"])
+        if source not in positions or target not in positions:
+            continue
+        width = 0.5 + 2.5 * float(data.get("row_count", 1)) / max_weight
+        ax.plot(
+            [positions[source][0], positions[target][0]],
+            [positions[source][1], positions[target][1]],
+            linewidth=width,
+            alpha=0.35,
+        )
+    for node_id, (x_pos, y_pos) in positions.items():
+        ax.scatter([x_pos], [y_pos], s=90)
+        label = labels.get(node_id, node_id)
+        label = label.replace("=", "=\n", 1)
+        ax.text(x_pos, y_pos, label, ha="center", va="center", fontsize=7)
+    ax.set_axis_off()
+    output_path = ensure_figure_parent(figure_path)
+    save_figure(fig, output_path)
+    plt.close(fig)
+    return output_path
+
+
+def _format_external_reference_label(value: Any, width: int = 34) -> str:
+    text = str(value).strip()
+    if not text:
+        return "Missing"
+
+    text = text.replace("_", " ").strip()
+
+    if "=" in text:
+        _family, item = text.split("=", 1)
+        text = item.strip()
+
+    return "\n".join(textwrap.wrap(text, width=width, break_long_words=False))
+
+
+def _external_context_groups(
+    context_nodes: pd.DataFrame,
+    max_examples_per_group: int = 5,
+    full_display_threshold: int = 6,
+) -> dict[str, dict[str, Any]]:
+    groups: dict[str, list[str]] = {}
+
+    for row in context_nodes.itertuples(index=False):
+        label = str(getattr(row, "node_label", "")).strip()
+        if not label:
+            continue
+
+        label = label.replace("_", " ").strip()
+
+        if "=" in label:
+            family, value = label.split("=", 1)
+            family = family.replace("_", " ").strip().lower()
+            value = value.replace("_", " ").strip()
+        else:
+            family = "reference context"
+            value = label
+
+        if family.startswith("technology"):
+            group_name = "Technology"
+        elif family.startswith("application"):
+            group_name = "Application"
+        elif family.startswith("measurement"):
+            group_name = "Measurement"
+        elif family.startswith("mobility"):
+            group_name = "Mobility"
+        elif family.startswith("network"):
+            group_name = "Network mode"
+        elif family.startswith("scenario"):
+            group_name = "Scenario"
+        else:
+            group_name = family.title()
+
+        groups.setdefault(group_name, []).append(value)
+
+    output: dict[str, dict[str, Any]] = {}
+    for group_name, values in groups.items():
+        unique_values = sorted(
+            set(str(value).strip() for value in values if str(value).strip()),
+            key=lambda item: item.lower(),
+        )
+
+        if len(unique_values) <= full_display_threshold:
+            display_values = unique_values
+        else:
+            display_values = unique_values[:max_examples_per_group]
+
+        output[group_name] = {
+            "total_count": len(unique_values),
+            "display_values": display_values,
+        }
+
+    return output
+
+
+def _draw_external_reference_box(
+    ax: Any,
+    center_x: float,
+    center_y: float,
+    width: float,
+    height: float,
+    label: str,
+    fontsize: float = 7.8,
+) -> None:
+    from matplotlib.patches import FancyBboxPatch
+
+    left = center_x - width / 2.0
+    bottom = center_y - height / 2.0
+
+    patch = FancyBboxPatch(
+        (left, bottom),
+        width,
+        height,
+        boxstyle="round,pad=0.010,rounding_size=0.008",
+        linewidth=0.60,
+        edgecolor="0.60",
+        facecolor="white",
+        zorder=3,
+    )
+    ax.add_patch(patch)
+
+    ax.text(
+        center_x,
+        center_y,
+        label,
+        ha="center",
+        va="center",
+        fontsize=fontsize,
+        color="0.08",
+        linespacing=1.08,
+        zorder=4,
+    )
+
+
+def _draw_context_summary_panel(
+    ax: Any,
+    left: float,
+    bottom: float,
+    width: float,
+    height: float,
+    context_groups: dict[str, dict[str, Any]],
+) -> None:
+    from matplotlib.patches import FancyBboxPatch
+
+    panel = FancyBboxPatch(
+        (left, bottom),
+        width,
+        height,
+        boxstyle="round,pad=0.014,rounding_size=0.010",
+        linewidth=0.75,
+        edgecolor="0.55",
+        facecolor="white",
+        zorder=3,
+    )
+    ax.add_patch(panel)
+
+    ax.text(
+        left + width / 2.0,
+        bottom + height - 0.040,
+        "Reference-context summary",
+        ha="center",
+        va="top",
+        fontsize=9.2,
+        fontweight="bold",
+        color="0.08",
+        zorder=4,
+    )
+
+    preferred_order = [
+        "Technology",
+        "Application",
+        "Measurement",
+        "Mobility",
+        "Network mode",
+        "Scenario",
+    ]
+    ordered_groups = [
+        group_name for group_name in preferred_order if group_name in context_groups
+    ]
+    ordered_groups.extend(
+        group_name
+        for group_name in sorted(context_groups)
+        if group_name not in ordered_groups
+    )
+
+    if not ordered_groups:
+        ax.text(
+            left + width / 2.0,
+            bottom + height / 2.0,
+            "No reference-context nodes",
+            ha="center",
+            va="center",
+            fontsize=7.8,
+            color="0.20",
+            zorder=4,
+        )
+        return
+
+    section_top = bottom + height - 0.098
+    section_gap = 0.014
+    available_height = height - 0.130
+    section_height = (
+        available_height - section_gap * max(len(ordered_groups) - 1, 0)
+    ) / max(len(ordered_groups), 1)
+
+    for index, group_name in enumerate(ordered_groups):
+        summary = context_groups[group_name]
+        total_count = int(summary.get("total_count", 0))
+        values = [str(value) for value in summary.get("display_values", [])]
+
+        y_top = section_top - index * (section_height + section_gap)
+
+        ax.text(
+            left + 0.020,
+            y_top,
+            f"{group_name} ({total_count} values)",
+            ha="left",
+            va="top",
+            fontsize=7.8,
+            fontweight="bold",
+            color="0.08",
+            zorder=4,
+        )
+
+        value_text = ", ".join(values) if values else "No values"
+        wrapped_value_text = "\n".join(
+            textwrap.wrap(
+                value_text,
+                width=46,
+                break_long_words=False,
+                max_lines=3,
+                placeholder=" ...",
+            )
+        )
+
+        ax.text(
+            left + 0.020,
+            y_top - 0.030,
+            wrapped_value_text,
+            ha="left",
+            va="top",
+            fontsize=6.9,
+            color="0.10",
+            linespacing=1.08,
+            zorder=4,
+        )
+
+        if index < len(ordered_groups) - 1:
+            ax.hlines(
+                y_top - section_height,
+                xmin=left + 0.015,
+                xmax=left + width - 0.015,
+                color="0.86",
+                linewidth=0.55,
+                zorder=4,
+            )
+
+
+def _draw_external_context_group_box(
+    ax: Any,
+    center_x: float,
+    center_y: float,
+    width: float,
+    height: float,
+    title: str,
+    values: list[str],
+) -> None:
+    from matplotlib.patches import FancyBboxPatch
+
+    left = center_x - width / 2.0
+    bottom = center_y - height / 2.0
+
+    patch = FancyBboxPatch(
+        (left, bottom),
+        width,
+        height,
+        boxstyle="round,pad=0.014,rounding_size=0.010",
+        linewidth=0.70,
+        edgecolor="0.55",
+        facecolor="white",
+        zorder=3,
+    )
+    ax.add_patch(patch)
+
+    wrapped_values = []
+    for value in values:
+        wrapped_values.append(
+            "\n".join(
+                textwrap.wrap(
+                    str(value),
+                    width=30,
+                    break_long_words=False,
+                )
+            )
+        )
+
+    body = "\n".join(wrapped_values)
+
+    ax.text(
+        center_x,
+        bottom + height - 0.030,
+        title,
+        ha="center",
+        va="top",
+        fontsize=8.2,
+        fontweight="bold",
+        color="0.08",
+        zorder=4,
+    )
+
+    ax.text(
+        center_x,
+        center_y - 0.018,
+        body,
+        ha="center",
+        va="center",
+        fontsize=7.3,
+        color="0.10",
+        linespacing=1.20,
+        zorder=4,
+    )
+
+
+def plot_external_reference_graph(
+    nodes: pd.DataFrame,
+    edges: pd.DataFrame,
+    figure_path: str | Path,
+) -> Path | None:
+    graph_view = "external_reference_evidence"
+
+    if nodes.empty or edges.empty or "graph_view" not in nodes.columns:
+        return None
+
+    external_nodes = nodes.loc[nodes["graph_view"].astype(str).eq(graph_view)].copy()
+    external_edges = edges.loc[edges["graph_view"].astype(str).eq(graph_view)].copy()
+
+    if external_nodes.empty or external_edges.empty:
+        return None
+
+    source_nodes = external_nodes.loc[
+        external_nodes["node_type"].astype(str).eq("source")
+    ].head(8)
+
+    metric_nodes = external_nodes.loc[
+        external_nodes["node_type"].astype(str).eq("metric")
+    ].head(8)
+
+    context_nodes = external_nodes.loc[
+        external_nodes["node_type"].astype(str).eq("reference_context")
+    ].copy()
+
+    if source_nodes.empty or metric_nodes.empty:
+        return None
+
+    fig, ax = plt.subplots(figsize=(13.8, 6.4))
+
+    source_x = 0.14
+    metric_x = 0.47
+    context_left = 0.665
+    context_bottom = 0.135
+    context_width = 0.305
+    context_height = 0.755
+
+    source_box_width = 0.24
+    metric_box_width = 0.30
+    source_box_height = 0.055
+    metric_box_height = 0.055
+
+    ax.text(
+        source_x,
+        0.95,
+        "Sources",
+        ha="center",
+        va="center",
+        fontsize=10.5,
+        fontweight="bold",
+        color="0.08",
+    )
+    ax.text(
+        metric_x,
+        0.95,
+        "Metrics",
+        ha="center",
+        va="center",
+        fontsize=10.5,
+        fontweight="bold",
+        color="0.08",
+    )
+    ax.text(
+        context_left + context_width / 2.0,
+        0.95,
+        "Reference contexts",
+        ha="center",
+        va="center",
+        fontsize=10.5,
+        fontweight="bold",
+        color="0.08",
+    )
+
+    positions: dict[str, tuple[float, float]] = {}
+    box_lookup: dict[str, tuple[float, float, float, float]] = {}
+
+    source_step = 0.70 / max(len(source_nodes) - 1, 1)
+    for item_index, row in enumerate(source_nodes.itertuples(index=False)):
+        y_pos = 0.82 - item_index * source_step
+        node_id = str(row.node_id)
+        label = _format_external_reference_label(
+            getattr(row, "node_label", node_id),
+            width=28,
+        )
+
+        positions[node_id] = (source_x, y_pos)
+        box_lookup[node_id] = (
+            source_x,
+            y_pos,
+            source_box_width,
+            source_box_height,
+        )
+
+        _draw_external_reference_box(
+            ax=ax,
+            center_x=source_x,
+            center_y=y_pos,
+            width=source_box_width,
+            height=source_box_height,
+            label=label,
+            fontsize=7.9,
+        )
+
+    metric_step = 0.70 / max(len(metric_nodes) - 1, 1)
+    for item_index, row in enumerate(metric_nodes.itertuples(index=False)):
+        y_pos = 0.82 - item_index * metric_step
+        node_id = str(row.node_id)
+        label = _format_external_reference_label(
+            getattr(row, "node_label", node_id),
+            width=32,
+        )
+
+        positions[node_id] = (metric_x, y_pos)
+        box_lookup[node_id] = (
+            metric_x,
+            y_pos,
+            metric_box_width,
+            metric_box_height,
+        )
+
+        _draw_external_reference_box(
+            ax=ax,
+            center_x=metric_x,
+            center_y=y_pos,
+            width=metric_box_width,
+            height=metric_box_height,
+            label=label,
+            fontsize=7.9,
+        )
+
+    source_ids = set(source_nodes["node_id"].astype(str))
+    metric_ids = set(metric_nodes["node_id"].astype(str))
+
+    source_metric_edges = external_edges.loc[
+        external_edges["source_node_id"].astype(str).isin(source_ids)
+        & external_edges["target_node_id"].astype(str).isin(metric_ids)
+    ].copy()
+
+    for row in source_metric_edges.itertuples(index=False):
+        data = row._asdict()
+        source = str(data["source_node_id"])
+        target = str(data["target_node_id"])
+
+        if source not in box_lookup or target not in box_lookup:
+            continue
+
+        source_x0, source_y, source_w, _source_h = box_lookup[source]
+        target_x0, target_y, target_w, _target_h = box_lookup[target]
+
+        start = (source_x0 + source_w / 2.0, source_y)
+        end = (target_x0 - target_w / 2.0, target_y)
+
+        ax.annotate(
+            "",
+            xy=end,
+            xytext=start,
+            arrowprops={
+                "arrowstyle": "-",
+                "lw": 0.48,
+                "alpha": 0.16,
+                "color": "0.30",
+                "shrinkA": 0,
+                "shrinkB": 0,
+            },
+            zorder=1,
+        )
+
+    context_groups = _external_context_groups(context_nodes)
+    _draw_context_summary_panel(
+        ax=ax,
+        left=context_left,
+        bottom=context_bottom,
+        width=context_width,
+        height=context_height,
+        context_groups=context_groups,
+    )
+
+    ax.annotate(
+        "",
+        xy=(context_left, context_bottom + context_height * 0.50),
+        xytext=(metric_x + metric_box_width / 2.0 + 0.025, 0.50),
+        arrowprops={
+            "arrowstyle": "-|>",
+            "lw": 0.85,
+            "color": "0.30",
+            "alpha": 0.70,
+            "mutation_scale": 9,
+        },
+        zorder=2,
+    )
+
+    ax.set_xlim(0.00, 1.00)
+    ax.set_ylim(0.02, 1.00)
+    ax.set_axis_off()
+
+    fig.subplots_adjust(left=0.025, right=0.985, bottom=0.035, top=0.97)
+
+    output_path = ensure_figure_parent(figure_path)
+    save_figure(fig, output_path)
+    plt.close(fig)
+    return output_path
+
+
+def plot_gnn_vs_classical_model_comparison(
+    model_comparison: pd.DataFrame,
+    figure_path: str | Path,
+) -> Path | None:
+    if model_comparison.empty or "f1" not in model_comparison.columns:
+        return None
+    plot_frame = model_comparison.copy()
+    plot_frame["f1"] = pd.to_numeric(plot_frame["f1"], errors="coerce")
+    plot_frame = plot_frame.dropna(subset=["f1"])
+    if plot_frame.empty:
+        return None
+    plot_frame = plot_frame.sort_values("f1", ascending=True).tail(12)
+    plot_frame["model_label"] = plot_frame["model_name"].map(
+        display_graph_model_name
+    )
+
+    fig, ax = plt.subplots(figsize=(8.8, max(4.5, 0.38 * len(plot_frame) + 1.2)))
+    ax.barh(plot_frame["model_label"], plot_frame["f1"])
+    for position, value in enumerate(plot_frame["f1"].astype(float)):
+        ax.text(value + 0.008, position, f"{value:.3f}", va="center", fontsize=8)
+    ax.set_xlabel("F1")
+    ax.set_ylabel("")
+    ax.set_xlim(0, min(1.08, max(0.1, float(plot_frame["f1"].max()) + 0.12)))
+    ax.grid(axis="x", linestyle="--", linewidth=0.5, alpha=0.5)
+    ax.spines["top"].set_visible(False)
+    ax.spines["right"].set_visible(False)
+    fig.tight_layout()
+    output_path = ensure_figure_parent(figure_path)
+    save_figure(fig, output_path)
+    plt.close(fig)
+    return output_path

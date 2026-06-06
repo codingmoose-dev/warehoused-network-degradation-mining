@@ -1,0 +1,8 @@
+metric,source_count,total_non_missing_count,main_text_candidate_count
+download_throughput_mbps,5,2078743.0,3
+signal_dbm,3,4133836.0,2
+jitter_ms,4,53522.0,0
+upload_throughput_mbps,4,2077831.0,0
+latency_ms,3,53220.0,0
+offered_downlink_mbps,3,50314.0,0
+packet_loss_fraction,3,3586.0,0

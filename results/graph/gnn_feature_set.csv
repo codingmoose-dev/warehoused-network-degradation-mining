@@ -1,0 +1,15 @@
+feature_name,feature_role
+has_congestion_level,graph_context
+has_mobility_state,graph_context
+has_obstruction_context,graph_context
+has_tower_load,graph_context
+has_weather_context,graph_context
+observed_in_area_type,graph_context
+observed_in_time_bin,graph_context
+uses_application,graph_context
+uses_infrastructure,graph_context
+uses_network_type,graph_context
+uses_radio_band,graph_context
+graph_degree,graph_degree_feature
+transition_out_degree,graph_degree_feature
+transition_in_degree,graph_degree_feature

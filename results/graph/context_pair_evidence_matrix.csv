@@ -1,0 +1,13 @@
+main_text_rank,context_pair_label,source_label,target_label,row_count,support_fraction,degraded_count,degradation_rate,baseline_degradation_rate,degradation_lift
+1,Network: 4G + Obstruction: High,Network: 4G,Obstruction: High,2030.0,0.0406,1867.0,0.9197044334975368,0.50716,1.8134404004604796
+2,Obstruction: High + Band: LTE Anchor,Obstruction: High,Band: LTE Anchor,2030.0,0.0406,1867.0,0.9197044334975368,0.50716,1.8134404004604796
+3,Obstruction: High + Tower load: Heavy,Obstruction: High,Tower load: Heavy,1567.0,0.03134,1407.0,0.8978940650925336,0.50716,1.7704354939122435
+4,Congestion: High + Obstruction: High,Congestion: High,Obstruction: High,3051.0,0.06102,2716.0,0.890199934447722,0.50716,1.7552644815200764
+5,Network: 4G + Tower load: Heavy,Network: 4G,Tower load: Heavy,2480.0,0.0496,2168.0,0.8741935483870967,0.50716,1.7237036603578686
+6,Band: LTE Anchor + Tower load: Heavy,Band: LTE Anchor,Tower load: Heavy,2480.0,0.0496,2168.0,0.8741935483870967,0.50716,1.7237036603578686
+7,App: Streaming + Obstruction: High,App: Streaming,Obstruction: High,2064.0,0.04128,1797.0,0.8706395348837209,0.50716,1.716695983286775
+8,Congestion: High + Network: 4G,Congestion: High,Network: 4G,4711.0,0.09422,4083.0,0.8666949692209722,0.50716,1.7089182293969796
+9,Congestion: High + Band: LTE Anchor,Congestion: High,Band: LTE Anchor,4711.0,0.09422,4083.0,0.8666949692209722,0.50716,1.7089182293969796
+10,Obstruction: High + Time: evening,Obstruction: High,Time: evening,1879.0,0.03758,1540.0,0.8195848855774348,0.50716,1.61602824666266
+11,App: Streaming + Congestion: High,App: Streaming,Congestion: High,4784.0,0.09568,3911.0,0.8175167224080268,0.50716,1.611950316286826
+12,Congestion: High + Band: n258,Congestion: High,Band: n258,1282.0,0.02564,1048.0,0.8174726989079563,0.50716,1.611863512319497
