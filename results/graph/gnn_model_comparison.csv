@@ -1,4 +1,4 @@
 model_name,train_row_count,test_row_count,accuracy,balanced_accuracy,precision,recall,f1,roc_auc,model_warning_count,model_warning_types,model_family,feature_source,best_validation_f1,best_epoch
-graphsage_transition_gnn,40000,10000,0.7463,0.7462119431786777,0.7379310344827587,0.7671778530173272,0.7522702861048726,0.8244303429512497,0,,true_gnn_optional_benchmark,warehouse_context_features_and_transition_edges,0.7557791352257756,37.0
+graphsage_transition_gnn,40000,10000,0.7463,0.7462119431786777,0.7379310344827587,0.7671778530173272,0.7522702861048726,0.8244303429512496,0,,true_gnn_optional_benchmark,warehouse_context_features_and_transition_edges,0.7557791352257756,37.0
 graph_context_logistic_regression,40000,10000,0.7457,0.7456690536021056,0.743705743509048,0.7530372435769767,0.7483424047501237,0.8248079696125841,6,RuntimeWarning,graph_derived_benchmark,warehouse_context_edges,,
-gcn_transition_gnn,40000,10000,0.708,0.7079100075325329,0.7011296189929159,0.7293367855008962,0.7149550956657555,0.7809410157995187,0,,true_gnn_optional_benchmark,warehouse_context_features_and_transition_edges,0.7252403846153846,17.0
+gcn_transition_gnn,40000,10000,0.708,0.7079100075325329,0.7011296189929159,0.7293367855008962,0.7149550956657555,0.780940975798813,0,,true_gnn_optional_benchmark,warehouse_context_features_and_transition_edges,0.7252403846153846,17.0
