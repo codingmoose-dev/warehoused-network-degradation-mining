@@ -1,0 +1,28 @@
+experiment_name,experiment_label,model_name,calibration_status,test_row_count,brier_score,expected_calibration_error,calibration_bin_count
+full_context,Full operating-context feature set,knn,ok,10000,0.10581980536995621,0.04331402993991564,10
+full_context,Full operating-context feature set,naive_bayes,ok,10000,0.16023710517833156,0.15915861344728702,10
+full_context,Full operating-context feature set,decision_tree_gini,ok,10000,0.029335056472511348,0.005645452155310991,10
+full_context,Full operating-context feature set,decision_tree_entropy,ok,10000,0.026969664536722792,0.0064230391834271166,10
+full_context,Full operating-context feature set,logistic_regression,ok,10000,0.032765185631155797,0.00907214850635327,10
+full_context,Full operating-context feature set,random_forest,ok,10000,0.044790204591172146,0.06576455918599926,10
+full_context,Full operating-context feature set,adaboost,ok,10000,0.10458013770776138,0.12482640408790704,10
+full_context,Full operating-context feature set,hist_gradient_boosting,ok,10000,0.014554235640244462,0.01221197196438412,10
+full_context,Full operating-context feature set,xgboost,ok,10000,0.020813187988382963,0.028758529188227838,10
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",knn,ok,10000,0.13448397407454596,0.04505387268604437,10
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",naive_bayes,ok,10000,0.17944543934470136,0.16870124880041085,10
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",decision_tree_gini,ok,10000,0.06562480250990002,0.011601383199057385,10
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",decision_tree_entropy,ok,10000,0.06575580967084098,0.011944200714723711,10
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",logistic_regression,ok,10000,0.07566672171187919,0.014907161429169483,10
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",random_forest,ok,10000,0.07978460366580832,0.0624095478482054,10
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",adaboost,ok,10000,0.1402781736764608,0.1086768493887383,10
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",hist_gradient_boosting,ok,10000,0.058506003712602776,0.0165584883674895,10
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",xgboost,ok,10000,0.0625217806144313,0.030219067103392443,10
+temporal_holdout,Session-preserving time-ordered holdout,knn,ok,10000,0.10126672012579363,0.037052601687792355,10
+temporal_holdout,Session-preserving time-ordered holdout,naive_bayes,ok,10000,0.14896138494969588,0.14620718383067632,10
+temporal_holdout,Session-preserving time-ordered holdout,decision_tree_gini,ok,10000,0.02574704542793951,0.004607624802073996,10
+temporal_holdout,Session-preserving time-ordered holdout,decision_tree_entropy,ok,10000,0.025309061658378592,0.007326630917292272,10
+temporal_holdout,Session-preserving time-ordered holdout,logistic_regression,ok,10000,0.030788784233922496,0.008291821802103376,10
+temporal_holdout,Session-preserving time-ordered holdout,random_forest,ok,10000,0.041801128262021925,0.06483079955502467,10
+temporal_holdout,Session-preserving time-ordered holdout,adaboost,ok,10000,0.10086611621530027,0.13073438470542512,10
+temporal_holdout,Session-preserving time-ordered holdout,hist_gradient_boosting,ok,10000,0.01316479879870591,0.01249953841339144,10
+temporal_holdout,Session-preserving time-ordered holdout,xgboost,ok,10000,0.019676851166610276,0.029355873227305693,10

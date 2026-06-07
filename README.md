@@ -20,13 +20,13 @@ The study evaluates descriptive degradation signatures, session-grouped supervis
 
 ### Layer-4: Graph-based analysis
 
-Three graph views are constructed: a warehouse measurement graph, a context co-occurrence degradation graph, and an external-reference evidence graph. The graph layer summarizes degradation-related context pairs, organizes external-reference evidence, and evaluates auxiliary transition-graph neural benchmarks over warehouse measurement nodes.
+Three graph views are constructed: a warehouse measurement graph, a context co-occurrence degradation graph, and an external-reference evidence graph. The graph layer summarizes degradation-related context pairs, organizes external-reference evidence, and evaluates auxiliary transition-graph neural models over warehouse measurement nodes.
 
 ## Data sources
 
 | Dataset | Role |
 |---|---|
-| SynNetQoS | Main dataset for warehouse construction, degradation labeling, mining, supervised modeling, graph construction, and graph neural benchmarking. |
+| SynNetQoS | Main dataset for warehouse construction, degradation labeling, mining, supervised modeling, graph construction, and graph neural modeling. |
 | Vienna 4G/5G | External reference for selected signal/RSRP and throughput comparisons. |
 | Campus QoS | External reference for controlled throughput, jitter, packet-loss, and offered-traffic comparisons. |
 | UCC 5G Context | External reference for production-trace signal, mobility, application context, and throughput comparisons. |
@@ -82,14 +82,14 @@ python scripts/13_gnn.py
 | 03 | `03_build_warehouse_tables.py` | Fact table and dimension tables |
 | 04 | `04_create_mining_feature_tables.py` | Supervised, clustering, association-rule, and external-reference summary tables |
 | 05 | `05_descriptive_warehouse_mining.py` | Frequency tables, degradation summaries, crosstabs, interaction matrices, and descriptive figures |
-| 06 | `06_supervised_classification.py` | Session-grouped supervised degradation-classification benchmarks |
+| 06 | `06_supervised_classification.py` | Session-grouped supervised degradation-classification analysis |
 | 07 | `07_decision_tree_rule_extraction.py` | Pruned decision-tree rules and representative decision paths |
 | 08 | `08_clustering_analysis.py` | Clustering validation, profiles, stability checks, and cluster figures |
 | 09 | `09_association_rule_mining.py` | Frequent itemsets, association rules, and degradation-rule summaries |
 | 10 | `10_external_reference_comparison.py` | Selected-variable comparison against external reference sources |
 | 11 | `11_build_graph_tables.py` | Warehouse, context co-occurrence, and external-reference graph tables |
 | 12 | `12_graph_mining.py` | Graph summaries, context-pair evidence, and external-reference evidence summaries |
-| 13 | `13_gnn.py` | Graph-derived baseline and GraphSAGE/GCN transition benchmarks |
+| 13 | `13_gnn.py` | Graph-derived logistic model and GraphSAGE/GCN transition models |
 
 ## Warehouse layer
 
@@ -120,7 +120,7 @@ The graph layer is built from three views.
 | Context co-occurrence degradation graph | Represents pairs of operating-context values with row count, support, degradation rate, baseline rate, and degradation lift. |
 | External-reference evidence graph | Organizes source, metric, context, and comparison evidence from the external reference sources. |
 
-The context co-occurrence graph is used for degradation-pattern evidence. The external-reference graph organizes comparison evidence while preserving dataset-specific measurement scope. GraphSAGE and GCN transition benchmarks are evaluated over warehouse measurement-transition structure.
+The context co-occurrence graph is used for degradation-pattern evidence. The external-reference graph organizes comparison evidence while preserving dataset-specific measurement scope. GraphSAGE and GCN transition models are evaluated over warehouse measurement-transition structure.
 
 ## Generated outputs
 
@@ -136,7 +136,7 @@ Generated outputs are written under `results/` and `figures/`.
 | `results/clustering/` | Cluster validation, profiles, stability checks, and sensitivity outputs |
 | `results/association_rules/` | Frequent itemsets, association rules, and selected degradation-rule summaries |
 | `results/external_reference/` | External-reference preparation, readiness, and selected-variable comparison outputs |
-| `results/graph/` | Graph-view summaries, context-pair evidence, external-reference graph summaries, and graph neural benchmark outputs |
+| `results/graph/` | Graph-view summaries, context-pair evidence, external-reference graph summaries, and graph neural modeling outputs |
 
 ## Figures
 
@@ -178,7 +178,7 @@ Install the project in editable mode with development dependencies.
 python -m pip install -e ".[dev]"
 ```
 
-Install optional graph-neural dependencies when running the transition-GNN benchmark.
+Install the graph-neural dependency group when running the transition-GNN analysis.
 
 ```bash
 python -m pip install -e ".[gnn]"

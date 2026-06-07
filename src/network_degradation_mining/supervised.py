@@ -23,6 +23,7 @@ from sklearn.metrics import (
     accuracy_score,
     average_precision_score,
     balanced_accuracy_score,
+    brier_score_loss,
     confusion_matrix,
     f1_score,
     precision_score,
@@ -34,7 +35,7 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
-from sklearn.svm import LinearSVC, SVC
+from sklearn.svm import SVC, LinearSVC
 from sklearn.tree import DecisionTreeClassifier
 
 from network_degradation_mining.io import ensure_directory, read_csv, write_csv
@@ -90,6 +91,41 @@ SENSITIVITY_NOTES = (
     "Reduced context feature set excluding capacity, offered-traffic, "
     "and synthetic deployment-area variables."
 )
+
+REPEATED_SPLIT_RANDOM_STATES = (11, 23, 37, 51, 73)
+TEMPORAL_TEST_FRACTION = 0.20
+CALIBRATION_BIN_COUNT = 10
+
+LABEL_COMPONENT_COLUMNS = [
+    "high_latency",
+    "high_jitter",
+    "downlink_service_shortfall",
+    "poor_video_quality",
+    "dropped_connection",
+    "anomalous",
+]
+
+IDENTIFIER_COLUMNS = {"measurement_id", "session_id", "timestamp"}
+DIRECT_OUTCOME_COLUMNS = {
+    "download_speed_mbps",
+    "upload_speed_mbps",
+    "latency_ms",
+    "jitter_ms",
+    "ping_ms",
+    "video_quality",
+    "video_quality_label",
+    "throughput_satisfaction_ratio",
+    "downlink_shortfall_fraction",
+}
+TARGET_COMPONENT_COLUMNS = {
+    "high_latency",
+    "high_jitter",
+    "downlink_service_shortfall",
+    "poor_video_quality",
+    "dropped_connection",
+    "anomalous",
+}
+
 
 
 @dataclass(frozen=True)
@@ -350,6 +386,66 @@ def _split_data(
     )
 
 
+def _split_data_temporal(
+    dataframe: pd.DataFrame,
+    test_fraction: float = TEMPORAL_TEST_FRACTION,
+) -> tuple[pd.DataFrame, pd.DataFrame, pd.Series, pd.Series]:
+    if "timestamp" not in dataframe.columns:
+        return _split_data(dataframe)
+
+    working = dataframe.copy()
+    working["__parsed_timestamp"] = pd.to_datetime(
+        working["timestamp"], errors="coerce"
+    )
+    if working["__parsed_timestamp"].notna().sum() == 0:
+        return _split_data(dataframe)
+
+    y = pd.to_numeric(working[TARGET_COLUMN], errors="coerce").fillna(0).astype(int)
+    X = working.drop(columns=[TARGET_COLUMN, "__parsed_timestamp"])
+
+    if (
+        "session_id" in working.columns
+        and working["session_id"].nunique(dropna=True) > 1
+    ):
+        session_order = (
+            working.assign(
+                __session_id=working["session_id"]
+                .astype("string")
+                .fillna("missing_session")
+            )
+            .groupby("__session_id", dropna=False)["__parsed_timestamp"]
+            .min()
+            .sort_values(kind="mergesort")
+        )
+        ordered_sessions = session_order.index.to_list()
+        test_session_count = max(
+            1, int(round(len(ordered_sessions) * test_fraction))
+        )
+        test_sessions = set(ordered_sessions[-test_session_count:])
+        session_values = (
+            working["session_id"].astype("string").fillna("missing_session")
+        )
+        test_mask = session_values.isin(test_sessions).to_numpy()
+    else:
+        ordered_index = working.sort_values(
+            "__parsed_timestamp", kind="mergesort"
+        ).index
+        test_count = max(1, int(round(len(ordered_index) * test_fraction)))
+        test_index = set(ordered_index[-test_count:])
+        test_mask = working.index.isin(test_index)
+
+    train_mask = ~test_mask
+    if train_mask.sum() == 0 or test_mask.sum() == 0:
+        return _split_data(dataframe)
+
+    return (
+        X.loc[train_mask],
+        X.loc[test_mask],
+        y.loc[train_mask],
+        y.loc[test_mask],
+    )
+
+
 def _positive_scores(
     model: Any,
     X_test: np.ndarray,
@@ -543,7 +639,7 @@ def _training_subset_note(
     if model_name == "knn":
         return (
             "Stratified training subset used to keep the instance-based "
-            "benchmark runtime bounded."
+            "training runtime bounded."
         )
     if model_name == "rbf_svm":
         return (
@@ -581,6 +677,7 @@ def _build_ranked_model_table(
     model_comparison: pd.DataFrame,
     experiment_name: str,
     experiment_label: str,
+    split_design: str = PRIMARY_SPLIT_DESCRIPTION,
 ) -> pd.DataFrame:
     metric_columns = [
         "accuracy",
@@ -617,7 +714,7 @@ def _build_ranked_model_table(
         3, "model_family", frame["model_name"].map(MODEL_FAMILIES).fillna("Other")
     )
     frame.insert(4, "model", frame["model_name"].map(display_model_name))
-    frame["split_design"] = PRIMARY_SPLIT_DESCRIPTION
+    frame["split_design"] = split_design
     frame["preprocessing"] = PRIMARY_PREPROCESSING_DESCRIPTION
     return frame[
         [
@@ -639,6 +736,243 @@ def _build_ranked_model_table(
     ]
 
 
+def _positive_probability_scores(model: Any, X_test: np.ndarray) -> np.ndarray | None:
+    if not hasattr(model, "predict_proba"):
+        return None
+    probabilities = model.predict_proba(X_test)
+    if probabilities.ndim != 2 or probabilities.shape[1] < 2:
+        return None
+    return np.clip(np.asarray(probabilities[:, 1], dtype=float), 0.0, 1.0)
+
+
+def _calibration_rows(
+    model_name: str,
+    y_test: pd.Series,
+    probabilities: np.ndarray,
+    experiment_name: str,
+    experiment_label: str,
+    bin_count: int = CALIBRATION_BIN_COUNT,
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    y_values = np.asarray(y_test, dtype=int)
+    bins = np.linspace(0.0, 1.0, bin_count + 1)
+    rows: list[dict[str, Any]] = []
+    expected_calibration_error = 0.0
+
+    for index in range(bin_count):
+        lower = float(bins[index])
+        upper = float(bins[index + 1])
+        if index == bin_count - 1:
+            mask = (probabilities >= lower) & (probabilities <= upper)
+        else:
+            mask = (probabilities >= lower) & (probabilities < upper)
+        sample_count = int(mask.sum())
+        if sample_count:
+            mean_probability = float(probabilities[mask].mean())
+            observed_fraction = float(y_values[mask].mean())
+            expected_calibration_error += (
+                sample_count / len(y_values)
+            ) * abs(observed_fraction - mean_probability)
+        else:
+            mean_probability = pd.NA
+            observed_fraction = pd.NA
+        rows.append(
+            {
+                "experiment_name": experiment_name,
+                "experiment_label": experiment_label,
+                "model_name": model_name,
+                "bin_index": index + 1,
+                "bin_lower": lower,
+                "bin_upper": upper,
+                "sample_count": sample_count,
+                "mean_predicted_probability": mean_probability,
+                "observed_degradation_fraction": observed_fraction,
+            }
+        )
+
+    summary = {
+        "experiment_name": experiment_name,
+        "experiment_label": experiment_label,
+        "model_name": model_name,
+        "calibration_status": "ok",
+        "test_row_count": int(len(y_values)),
+        "brier_score": float(brier_score_loss(y_values, probabilities)),
+        "expected_calibration_error": float(expected_calibration_error),
+        "calibration_bin_count": int(bin_count),
+    }
+    return rows, summary
+
+
+def _build_repeated_grouped_summary(model_comparison: pd.DataFrame) -> pd.DataFrame:
+    if model_comparison.empty:
+        return pd.DataFrame()
+    metric_columns = [
+        "accuracy",
+        "balanced_accuracy",
+        "precision",
+        "recall",
+        "f1",
+        "roc_auc",
+        "pr_auc",
+    ]
+    frame = model_comparison.loc[model_comparison["training_status"].eq("ok")].copy()
+    if frame.empty:
+        return pd.DataFrame()
+    for column in metric_columns:
+        frame[column] = pd.to_numeric(frame[column], errors="coerce")
+
+    rows: list[dict[str, Any]] = []
+    for model_name, group in frame.groupby("model_name", sort=False):
+        row: dict[str, Any] = {
+            "model_name": model_name,
+            "model": display_model_name(model_name),
+            "split_count": int(group["split_random_state"].nunique()),
+            "mean_train_rows": float(group["train_row_count"].mean()),
+            "mean_test_rows": float(group["test_row_count"].mean()),
+        }
+        for metric in metric_columns:
+            row[f"{metric}_mean"] = float(group[metric].mean())
+            row[f"{metric}_std"] = float(group[metric].std(ddof=1))
+        rows.append(row)
+
+    return pd.DataFrame(rows).sort_values(
+        ["f1_mean", "balanced_accuracy_mean"], ascending=[False, False]
+    )
+
+
+def _run_repeated_grouped_evaluation(data: pd.DataFrame) -> dict[str, pd.DataFrame]:
+    frames: list[pd.DataFrame] = []
+    for random_state in REPEATED_SPLIT_RANDOM_STATES:
+        X_train, X_test, y_train, y_test = _split_data(data, random_state=random_state)
+        experiment = _run_model_experiment(
+            data=data,
+            X_train=X_train,
+            X_test=X_test,
+            y_train=y_train,
+            y_test=y_test,
+            experiment_name="repeated_session_grouped",
+            experiment_label="Repeated session-grouped holdout stability analysis",
+        )
+        frame = experiment["model_comparison"].copy()
+        frame.insert(0, "split_random_state", random_state)
+        frames.append(frame)
+
+    combined = pd.concat(frames, ignore_index=True) if frames else pd.DataFrame()
+    return {
+        "model_comparison": combined,
+        "summary": _build_repeated_grouped_summary(combined),
+    }
+
+
+def _build_label_component_summary(dataframe: pd.DataFrame) -> pd.DataFrame:
+    available = [
+        column for column in LABEL_COMPONENT_COLUMNS if column in dataframe.columns
+    ]
+    row_count = len(dataframe)
+    if TARGET_COLUMN not in dataframe.columns:
+        return pd.DataFrame()
+
+    target = (
+        pd.to_numeric(dataframe[TARGET_COLUMN], errors="coerce")
+        .fillna(0)
+        .astype(int)
+    )
+    target_positive = target.eq(1)
+    component_frame = pd.DataFrame(index=dataframe.index)
+    for column in available:
+        component_frame[column] = (
+            pd.to_numeric(dataframe[column], errors="coerce")
+            .fillna(0)
+            .astype(int)
+            .eq(1)
+        )
+
+    rows: list[dict[str, Any]] = []
+    for column in available:
+        values = component_frame[column]
+        positive_count = int(values.sum())
+        other_columns = [name for name in available if name != column]
+        if other_columns:
+            unique_mask = values & ~component_frame[other_columns].any(axis=1)
+        else:
+            unique_mask = values
+        rows.append(
+            {
+                "component_name": column,
+                "row_count": int(row_count),
+                "positive_count": positive_count,
+                "positive_fraction": (
+                    float(positive_count / row_count) if row_count else 0.0
+                ),
+                "positive_among_degraded_fraction": (
+                    float((values & target_positive).sum() / target_positive.sum())
+                    if int(target_positive.sum())
+                    else 0.0
+                ),
+                "unique_positive_count_among_available_components": int(
+                    unique_mask.sum()
+                ),
+                "available_component_count": int(len(available)),
+                "audit_note": (
+                    "Unique counts are calculated only among label components present "
+                    "in the supervised table."
+                ),
+            }
+        )
+    return pd.DataFrame(rows)
+
+
+def _build_predictor_exclusion_audit(
+    dataframe: pd.DataFrame,
+    full_feature_set: pd.DataFrame,
+    reduced_feature_set: pd.DataFrame,
+) -> pd.DataFrame:
+    full_features = set(
+        full_feature_set.get("feature_name", pd.Series(dtype="string")).astype(str)
+    )
+    reduced_features = set(
+        reduced_feature_set.get("feature_name", pd.Series(dtype="string")).astype(str)
+    )
+    rows: list[dict[str, Any]] = []
+
+    audited_columns = sorted(
+        set(dataframe.columns)
+        | EXCLUDED_COLUMNS
+        | SENSITIVITY_EXCLUDED_FEATURES
+        | IDENTIFIER_COLUMNS
+        | DIRECT_OUTCOME_COLUMNS
+        | TARGET_COMPONENT_COLUMNS
+    )
+
+    for column in audited_columns:
+        reasons: list[str] = []
+        if column in IDENTIFIER_COLUMNS:
+            reasons.append("identifier_or_split_field")
+        if column == TARGET_COLUMN:
+            reasons.append("target_label")
+        if column in TARGET_COMPONENT_COLUMNS:
+            reasons.append("target_component")
+        if column in DIRECT_OUTCOME_COLUMNS:
+            reasons.append("direct_outcome_or_label_definition_field")
+        if column in SENSITIVITY_EXCLUDED_FEATURES:
+            reasons.append("reduced_context_exclusion")
+        if not reasons and column in dataframe.columns:
+            reasons.append("candidate_predictor")
+        elif not reasons:
+            reasons.append("not_present_in_supervised_table")
+
+        rows.append(
+            {
+                "column_name": column,
+                "present_in_supervised_table": bool(column in dataframe.columns),
+                "used_in_full_context": bool(column in full_features),
+                "used_in_reduced_context": bool(column in reduced_features),
+                "exclusion_reason": ";".join(reasons),
+            }
+        )
+
+    return pd.DataFrame(rows)
+
+
 def _run_model_experiment(
     data: pd.DataFrame,
     X_train: pd.DataFrame,
@@ -648,6 +982,7 @@ def _run_model_experiment(
     experiment_name: str,
     experiment_label: str,
     excluded_features: set[str] | None = None,
+    split_design: str = PRIMARY_SPLIT_DESCRIPTION,
 ) -> dict[str, pd.DataFrame]:
     numeric_columns, categorical_columns = _feature_columns(
         X_train, excluded_features=excluded_features
@@ -665,6 +1000,8 @@ def _run_model_experiment(
     rows: list[dict[str, Any]] = []
     confusion_rows: list[dict[str, Any]] = []
     importance_rows: list[dict[str, Any]] = []
+    calibration_rows: list[dict[str, Any]] = []
+    calibration_summary_rows: list[dict[str, Any]] = []
     positive_fraction = float(y_test.mean()) if len(y_test) else 0.0
 
     for spec in _model_specs():
@@ -721,6 +1058,20 @@ def _run_model_experiment(
                 importance_row["experiment_name"] = experiment_name
                 importance_row["experiment_label"] = experiment_label
                 importance_rows.append(importance_row)
+
+            probability_scores = _positive_probability_scores(
+                spec.estimator, X_test_processed
+            )
+            if probability_scores is not None and y_test.nunique() > 1:
+                model_calibration_rows, model_calibration_summary = _calibration_rows(
+                    model_name=spec.name,
+                    y_test=y_test,
+                    probabilities=probability_scores,
+                    experiment_name=experiment_name,
+                    experiment_label=experiment_label,
+                )
+                calibration_rows.extend(model_calibration_rows)
+                calibration_summary_rows.append(model_calibration_summary)
         except Exception as exc:
             row = _failed_model_row(
                 spec.name,
@@ -740,6 +1091,7 @@ def _run_model_experiment(
         model_comparison=model_comparison,
         experiment_name=experiment_name,
         experiment_label=experiment_label,
+        split_design=split_design,
     )
 
     return {
@@ -750,6 +1102,8 @@ def _run_model_experiment(
             numeric_columns, categorical_columns, experiment_name
         ),
         "ranked_model_performance_table": ranked_table,
+        "calibration_curve": pd.DataFrame(calibration_rows),
+        "calibration_summary": pd.DataFrame(calibration_summary_rows),
     }
 
 
@@ -790,6 +1144,44 @@ def run_supervised_classification(
         excluded_features=SENSITIVITY_EXCLUDED_FEATURES,
     )
 
+    temporal_X_train, temporal_X_test, temporal_y_train, temporal_y_test = (
+        _split_data_temporal(data)
+    )
+    temporal = _run_model_experiment(
+        data=data,
+        X_train=temporal_X_train,
+        X_test=temporal_X_test,
+        y_train=temporal_y_train,
+        y_test=temporal_y_test,
+        experiment_name="temporal_holdout",
+        experiment_label="Session-preserving time-ordered holdout",
+        split_design="Session-preserving time-ordered holdout",
+    )
+    repeated = _run_repeated_grouped_evaluation(data)
+
+    calibration_curve = pd.concat(
+        [
+            primary["calibration_curve"],
+            sensitivity["calibration_curve"],
+            temporal["calibration_curve"],
+        ],
+        ignore_index=True,
+    )
+    calibration_summary = pd.concat(
+        [
+            primary["calibration_summary"],
+            sensitivity["calibration_summary"],
+            temporal["calibration_summary"],
+        ],
+        ignore_index=True,
+    )
+    label_component_summary = _build_label_component_summary(data)
+    predictor_exclusion_audit = _build_predictor_exclusion_audit(
+        dataframe=data,
+        full_feature_set=primary["feature_set"],
+        reduced_feature_set=sensitivity["feature_set"],
+    )
+
     output_paths = {
         "model_comparison": output_dir / "model_comparison.csv",
         "confusion_matrices": output_dir / "confusion_matrices.csv",
@@ -805,6 +1197,24 @@ def run_supervised_classification(
         "sensitivity_feature_set": output_dir / "sensitivity_feature_set.csv",
         "sensitivity_ranked_model_performance_table": output_dir
         / "sensitivity_ranked_model_performance_table.csv",
+        "temporal_holdout_model_comparison": output_dir
+        / "temporal_holdout_model_comparison.csv",
+        "temporal_holdout_confusion_matrices": output_dir
+        / "temporal_holdout_confusion_matrices.csv",
+        "temporal_holdout_feature_importance": output_dir
+        / "temporal_holdout_feature_importance.csv",
+        "temporal_holdout_feature_set": output_dir
+        / "temporal_holdout_feature_set.csv",
+        "temporal_holdout_ranked_model_performance_table": output_dir
+        / "temporal_holdout_ranked_model_performance_table.csv",
+        "calibration_curve": output_dir / "calibration_curve.csv",
+        "calibration_summary": output_dir / "calibration_summary.csv",
+        "label_component_summary": output_dir / "label_component_summary.csv",
+        "predictor_exclusion_audit": output_dir / "predictor_exclusion_audit.csv",
+        "repeated_grouped_model_comparison": output_dir
+        / "repeated_grouped_model_comparison.csv",
+        "repeated_grouped_model_summary": output_dir
+        / "repeated_grouped_model_summary.csv",
     }
 
     write_csv(primary["model_comparison"], output_paths["model_comparison"])
@@ -830,6 +1240,35 @@ def run_supervised_classification(
     write_csv(
         sensitivity["ranked_model_performance_table"],
         output_paths["sensitivity_ranked_model_performance_table"],
+    )
+    write_csv(
+        temporal["model_comparison"],
+        output_paths["temporal_holdout_model_comparison"],
+    )
+    write_csv(
+        temporal["confusion_matrices"],
+        output_paths["temporal_holdout_confusion_matrices"],
+    )
+    write_csv(
+        temporal["feature_importance"],
+        output_paths["temporal_holdout_feature_importance"],
+    )
+    write_csv(temporal["feature_set"], output_paths["temporal_holdout_feature_set"])
+    write_csv(
+        temporal["ranked_model_performance_table"],
+        output_paths["temporal_holdout_ranked_model_performance_table"],
+    )
+    write_csv(calibration_curve, output_paths["calibration_curve"])
+    write_csv(calibration_summary, output_paths["calibration_summary"])
+    write_csv(label_component_summary, output_paths["label_component_summary"])
+    write_csv(predictor_exclusion_audit, output_paths["predictor_exclusion_audit"])
+    write_csv(
+        repeated["model_comparison"],
+        output_paths["repeated_grouped_model_comparison"],
+    )
+    write_csv(
+        repeated["summary"],
+        output_paths["repeated_grouped_model_summary"],
     )
 
     ranked_metric_path = figure_output_dir / "model_comparison.pdf"
