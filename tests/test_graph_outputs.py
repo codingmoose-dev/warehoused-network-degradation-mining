@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from network_degradation_mining.gnn import run_graph_neural_benchmark
+from network_degradation_mining.gnn import run_graph_neural_modeling
 from network_degradation_mining.graph_mining import run_graph_mining
 from network_degradation_mining.io import write_csv
 
@@ -207,10 +207,10 @@ def test_graph_outputs_are_written(tmp_path: Path) -> None:
     assert output_paths["context_pair_evidence_matrix"].exists()
 
 
-def test_true_gnn_benchmark_is_audited(tmp_path: Path) -> None:
+def test_true_gnn_modeling_is_audited(tmp_path: Path) -> None:
     nodes_path, edges_path, supervised_path = _write_small_graph(tmp_path)
 
-    output_paths = run_graph_neural_benchmark(
+    output_paths = run_graph_neural_modeling(
         graph_nodes_path=nodes_path,
         graph_edges_path=edges_path,
         results_dir=tmp_path / "results",

@@ -1213,6 +1213,74 @@ def _projection_axis_limits(values: pd.Series) -> tuple[float, float]:
     return lower - padding, upper + padding
 
 
+def _cluster_projection_display_frame(
+    projection: pd.DataFrame,
+    cluster_summary: pd.DataFrame | None = None,
+) -> tuple[pd.DataFrame, list[str], dict[str, str]]:
+    data = projection.copy()
+    data["cluster_name"] = data["cluster_name"].astype(str)
+
+    summary_map: dict[str, dict[str, Any]] = {}
+    if cluster_summary is not None and not cluster_summary.empty:
+        required = {"cluster_label", "profile_label", "post_hoc_degradation_rate"}
+        if required.issubset(cluster_summary.columns):
+            summary = cluster_summary.copy()
+            summary["cluster_label"] = pd.to_numeric(
+                summary["cluster_label"], errors="coerce"
+            )
+            summary["post_hoc_degradation_rate"] = pd.to_numeric(
+                summary["post_hoc_degradation_rate"], errors="coerce"
+            )
+            for _, row in summary.dropna(subset=["cluster_label"]).iterrows():
+                cluster_name = f"C{int(row['cluster_label'])}"
+                summary_map[cluster_name] = {
+                    "profile_label": str(row.get("profile_label", cluster_name)),
+                    "degradation_rate": row.get("post_hoc_degradation_rate", np.nan),
+                    "row_count": row.get("row_count", np.nan),
+                }
+
+    sampled_rates = pd.Series(dtype="float64")
+    if "service_degraded" in data.columns:
+        sampled_rates = (
+            data.assign(
+                service_degraded=pd.to_numeric(
+                    data["service_degraded"], errors="coerce"
+                )
+            )
+            .groupby("cluster_name")["service_degraded"]
+            .mean()
+        )
+
+    label_map: dict[str, str] = {}
+    cluster_order = sorted(
+        data["cluster_name"].dropna().astype(str).unique(),
+        key=lambda value: (
+            int(value[1:]) if value.startswith("C") and value[1:].isdigit() else 999,
+            value,
+        ),
+    )
+    for cluster_name in cluster_order:
+        summary_row = summary_map.get(cluster_name, {})
+        profile_label = str(summary_row.get("profile_label", cluster_name))
+        profile_label = profile_label.replace("-", " ").capitalize()
+        rate = summary_row.get("degradation_rate", np.nan)
+        if pd.isna(rate) and cluster_name in sampled_rates.index:
+            rate = sampled_rates.loc[cluster_name]
+        if pd.notna(rate):
+            rate_text = f"{100.0 * float(rate):.1f}%"
+            label_map[cluster_name] = (
+                f"{profile_label}\n{cluster_name}; degradation = {rate_text}"
+            )
+        else:
+            label_map[cluster_name] = f"{profile_label}\n{cluster_name}"
+
+    data["cluster_profile_label"] = data["cluster_name"].map(label_map).fillna(
+        data["cluster_name"]
+    )
+    profile_order = [label_map[cluster_name] for cluster_name in cluster_order]
+    return data, profile_order, label_map
+
+
 def _draw_projection_panel(
     ax: Any,
     data: pd.DataFrame,
@@ -1221,28 +1289,30 @@ def _draw_projection_panel(
     color_map: dict[str, str],
     marker_map: dict[str, str],
     panel_label: str,
+    legend_anchor: tuple[float, float] = (0.99, 0.99),
 ) -> None:
-    for group in group_order:
+    for index, group in enumerate(group_order):
         group_data = data[data[group_column].astype("string").eq(group)]
         if group_data.empty:
             continue
-        
-        marker = marker_map.get(group, "o")
-        marker_size = 7.2 if marker != "o" else 5.2
+
+        marker = marker_map.get(group, marker_map.get(f"C{index}", "o"))
+        marker_size = 7.0 if marker != "o" else 5.0
+        color = color_map.get(group, color_map.get(f"C{index}", "0.45"))
 
         ax.scatter(
             group_data["pc1"],
             group_data["pc2"],
             s=marker_size,
-            alpha=0.72,
+            alpha=0.78,
             linewidths=0,
             marker=marker,
-            color=color_map.get(group, "0.45"),
+            color=color,
             label=group,
         )
 
-    ax.set_xlabel("")
-    ax.set_ylabel("")
+    ax.set_xlabel("PCA projection 1")
+    ax.set_ylabel("PCA projection 2")
     ax.set_xticklabels([])
     ax.set_yticklabels([])
     ax.tick_params(length=2.2, width=0.45, color="0.45")
@@ -1253,21 +1323,23 @@ def _draw_projection_panel(
 
     ax.legend(
         frameon=False,
-        fontsize=7.8,
+        fontsize=7.6,
         loc="upper right",
-        markerscale=1.7,
+        bbox_to_anchor=legend_anchor,
+        markerscale=1.65,
         handletextpad=0.25,
-        borderaxespad=0.25,
+        borderaxespad=0.15,
+        labelspacing=0.48,
     )
 
     ax.text(
         0.5,
-        -0.13,
+        -0.18,
         panel_label,
         transform=ax.transAxes,
         ha="center",
         va="top",
-        fontsize=11,
+        fontsize=10.6,
         color="0.08",
     )
 
@@ -1275,6 +1347,7 @@ def _draw_projection_panel(
 def plot_cluster_projection_view(
     projection: pd.DataFrame,
     path: str | Path,
+    cluster_summary: pd.DataFrame | None = None,
 ) -> Path:
     required_columns = {"pc1", "pc2", "cluster_name", "degradation_status"}
 
@@ -1313,7 +1386,28 @@ def plot_cluster_projection_view(
         plt.close(fig)
         return output_path
 
-    cluster_order = sorted(data["cluster_name"].astype(str).unique())
+    data, cluster_order, cluster_label_map = _cluster_projection_display_frame(
+        data,
+        cluster_summary=cluster_summary,
+    )
+    original_cluster_order = [
+        cluster_name
+        for cluster_name, label in cluster_label_map.items()
+        if label in set(cluster_order)
+    ]
+    cluster_color_map = {
+        cluster_label_map[cluster_name]: CLUSTER_PROJECTION_CLUSTER_COLORS.get(
+            cluster_name, "0.45"
+        )
+        for cluster_name in original_cluster_order
+    }
+    cluster_marker_map = {
+        cluster_label_map[cluster_name]: CLUSTER_PROJECTION_CLUSTER_MARKERS.get(
+            cluster_name, "o"
+        )
+        for cluster_name in original_cluster_order
+    }
+
     status_values = set(data["degradation_status"].astype(str))
     status_order = [
         status
@@ -1327,7 +1421,7 @@ def plot_cluster_projection_view(
     fig, axes = plt.subplots(
         1,
         2,
-        figsize=(9.7, 4.1),
+        figsize=(10.2, 4.2),
         sharex=True,
         sharey=True,
     )
@@ -1335,11 +1429,12 @@ def plot_cluster_projection_view(
     _draw_projection_panel(
         axes[0],
         data,
-        group_column="cluster_name",
+        group_column="cluster_profile_label",
         group_order=cluster_order,
-        color_map=CLUSTER_PROJECTION_CLUSTER_COLORS,
-        marker_map=CLUSTER_PROJECTION_CLUSTER_MARKERS,
-        panel_label="(a) K-Means profiles",
+        color_map=cluster_color_map,
+        marker_map=cluster_marker_map,
+        panel_label="(a) Reduced-context K-Means profiles",
+        legend_anchor=(0.99, 0.99),
     )
 
     _draw_projection_panel(
@@ -1349,17 +1444,21 @@ def plot_cluster_projection_view(
         group_order=status_order,
         color_map=CLUSTER_PROJECTION_STATUS_COLORS,
         marker_map=CLUSTER_PROJECTION_STATUS_MARKERS,
-        panel_label="(b) Service-degradation label",
+        panel_label="(b) Post-hoc service-degradation overlay",
+        legend_anchor=(0.99, 0.99),
     )
 
     for ax in axes:
         ax.set_xlim(*x_limits)
         ax.set_ylim(*y_limits)
+        ax.grid(linewidth=0.25, alpha=0.20)
+
+    axes[1].set_ylabel("")
 
     fig.subplots_adjust(
-        left=0.045,
+        left=0.07,
         right=0.99,
-        bottom=0.16,
+        bottom=0.21,
         top=0.98,
         wspace=0.08,
     )
@@ -1586,6 +1685,7 @@ def plot_clustering_analysis_outputs(
     selected_k = _selected_k_from_table(selection, method="kmeans")
     effect_sizes_path = results_path / "cluster_profile_effect_sizes.csv"
     projection_path = results_path / "cluster_projection_table.csv"
+    kmeans_summary_path = results_path / "kmeans_cluster_summary.csv"
     null_baseline_path = results_path / "cluster_null_baseline.csv"
     pairwise_stability_path = results_path / "kmeans_pairwise_stability.csv"
 
@@ -1615,9 +1715,15 @@ def plot_clustering_analysis_outputs(
 
     if projection_path.exists():
         projection = pd.read_csv(projection_path)
+        cluster_summary = (
+            pd.read_csv(kmeans_summary_path)
+            if kmeans_summary_path.exists()
+            else pd.DataFrame()
+        )
         outputs["cluster_projection_view"] = plot_cluster_projection_view(
             projection,
             figures_path / "cluster_projection_view.pdf",
+            cluster_summary=cluster_summary,
         )
 
     if null_baseline_path.exists() and pairwise_stability_path.exists():
@@ -2723,7 +2829,10 @@ def plot_graph_schema(figure_path: str | Path) -> Path:
                 "within-session transitions",
             ],
             "output_title": "Structure analysis",
-            "output_lines": ["transition summaries", "auxiliary graph benchmark"],
+            "output_lines": [
+                "transition summaries",
+                "transition-graph model comparison",
+            ],
         },
         {
             "view_title": "Context co-occurrence",

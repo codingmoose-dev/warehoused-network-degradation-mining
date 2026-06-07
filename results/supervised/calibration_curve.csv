@@ -1,0 +1,271 @@
+experiment_name,experiment_label,model_name,bin_index,bin_lower,bin_upper,sample_count,mean_predicted_probability,observed_degradation_fraction
+full_context,Full operating-context feature set,knn,1,0.0,0.1,1981,0.0,0.01463907117617365
+full_context,Full operating-context feature set,knn,2,0.1,0.2,1025,0.14163343346927681,0.07609756097560975
+full_context,Full operating-context feature set,knn,3,0.2,0.30000000000000004,798,0.2826905088056272,0.17794486215538846
+full_context,Full operating-context feature set,knn,4,0.30000000000000004,0.4,77,0.3120204941685105,0.36363636363636365
+full_context,Full operating-context feature set,knn,5,0.4,0.5,901,0.4272641448201186,0.3806881243063263
+full_context,Full operating-context feature set,knn,6,0.5,0.6000000000000001,930,0.5710270357762662,0.5870967741935483
+full_context,Full operating-context feature set,knn,7,0.6000000000000001,0.7000000000000001,83,0.6844222482515301,0.6265060240963856
+full_context,Full operating-context feature set,knn,8,0.7000000000000001,0.8,1010,0.7161743303395465,0.7871287128712872
+full_context,Full operating-context feature set,knn,9,0.8,0.9,1302,0.8578926590289568,0.901689708141321
+full_context,Full operating-context feature set,knn,10,0.9,1.0,1893,1.0,0.9688325409403064
+full_context,Full operating-context feature set,naive_bayes,1,0.0,0.1,3724,0.003289870960537154,0.08754027926960257
+full_context,Full operating-context feature set,naive_bayes,2,0.1,0.2,103,0.1466072634804369,0.2912621359223301
+full_context,Full operating-context feature set,naive_bayes,3,0.2,0.30000000000000004,73,0.2460148623393538,0.1643835616438356
+full_context,Full operating-context feature set,naive_bayes,4,0.30000000000000004,0.4,54,0.3465837396813497,0.2777777777777778
+full_context,Full operating-context feature set,naive_bayes,5,0.4,0.5,76,0.44895113528721164,0.15789473684210525
+full_context,Full operating-context feature set,naive_bayes,6,0.5,0.6000000000000001,58,0.547120642610427,0.22413793103448276
+full_context,Full operating-context feature set,naive_bayes,7,0.6000000000000001,0.7000000000000001,76,0.6506190488097267,0.21052631578947367
+full_context,Full operating-context feature set,naive_bayes,8,0.7000000000000001,0.8,86,0.7521882979331579,0.4069767441860465
+full_context,Full operating-context feature set,naive_bayes,9,0.8,0.9,125,0.8530286922157312,0.384
+full_context,Full operating-context feature set,naive_bayes,10,0.9,1.0,5625,0.9963815900022827,0.8024888888888889
+full_context,Full operating-context feature set,decision_tree_gini,1,0.0,0.1,4402,0.008581533196599569,0.01113130395274875
+full_context,Full operating-context feature set,decision_tree_gini,2,0.1,0.2,210,0.15443440513310402,0.20476190476190476
+full_context,Full operating-context feature set,decision_tree_gini,3,0.2,0.30000000000000004,181,0.23377750798857622,0.26519337016574585
+full_context,Full operating-context feature set,decision_tree_gini,4,0.30000000000000004,0.4,160,0.34578703370110725,0.3125
+full_context,Full operating-context feature set,decision_tree_gini,5,0.4,0.5,59,0.4649208612769266,0.6101694915254238
+full_context,Full operating-context feature set,decision_tree_gini,6,0.5,0.6000000000000001,210,0.5446607669078377,0.5571428571428572
+full_context,Full operating-context feature set,decision_tree_gini,7,0.6000000000000001,0.7000000000000001,99,0.6501428067614605,0.6161616161616161
+full_context,Full operating-context feature set,decision_tree_gini,8,0.7000000000000001,0.8,49,0.7550459862334844,0.7551020408163265
+full_context,Full operating-context feature set,decision_tree_gini,9,0.8,0.9,138,0.831688273104388,0.8043478260869565
+full_context,Full operating-context feature set,decision_tree_gini,10,0.9,1.0,4492,0.9960638212265992,0.994879786286732
+full_context,Full operating-context feature set,decision_tree_entropy,1,0.0,0.1,4494,0.007569449716425905,0.010235870048954161
+full_context,Full operating-context feature set,decision_tree_entropy,2,0.1,0.2,211,0.1562161071808339,0.26066350710900477
+full_context,Full operating-context feature set,decision_tree_entropy,3,0.2,0.30000000000000004,147,0.21526708416258122,0.2585034013605442
+full_context,Full operating-context feature set,decision_tree_entropy,4,0.30000000000000004,0.4,49,0.3591650721630214,0.32653061224489793
+full_context,Full operating-context feature set,decision_tree_entropy,5,0.4,0.5,79,0.4227875112137917,0.3924050632911392
+full_context,Full operating-context feature set,decision_tree_entropy,6,0.5,0.6000000000000001,198,0.5574903517690354,0.5454545454545454
+full_context,Full operating-context feature set,decision_tree_entropy,7,0.6000000000000001,0.7000000000000001,67,0.6314601761282302,0.6268656716417911
+full_context,Full operating-context feature set,decision_tree_entropy,8,0.7000000000000001,0.8,0,,
+full_context,Full operating-context feature set,decision_tree_entropy,9,0.8,0.9,191,0.8605727510104639,0.8219895287958116
+full_context,Full operating-context feature set,decision_tree_entropy,10,0.9,1.0,4564,0.9942580499630166,0.9921121822962313
+full_context,Full operating-context feature set,logistic_regression,1,0.0,0.1,4150,0.007988518649512546,0.006265060240963855
+full_context,Full operating-context feature set,logistic_regression,2,0.1,0.2,281,0.14762135472874272,0.11743772241992882
+full_context,Full operating-context feature set,logistic_regression,3,0.2,0.30000000000000004,184,0.2479598018051772,0.20652173913043478
+full_context,Full operating-context feature set,logistic_regression,4,0.30000000000000004,0.4,158,0.34667127978371004,0.27848101265822783
+full_context,Full operating-context feature set,logistic_regression,5,0.4,0.5,156,0.45384254577026456,0.42948717948717946
+full_context,Full operating-context feature set,logistic_regression,6,0.5,0.6000000000000001,147,0.5498187335207805,0.46938775510204084
+full_context,Full operating-context feature set,logistic_regression,7,0.6000000000000001,0.7000000000000001,172,0.6488899144165788,0.6337209302325582
+full_context,Full operating-context feature set,logistic_regression,8,0.7000000000000001,0.8,228,0.7521762382880159,0.7368421052631579
+full_context,Full operating-context feature set,logistic_regression,9,0.8,0.9,334,0.8566217330999513,0.8892215568862275
+full_context,Full operating-context feature set,logistic_regression,10,0.9,1.0,4190,0.9894815067948333,0.9952267303102625
+full_context,Full operating-context feature set,random_forest,1,0.0,0.1,3036,0.0336247392225514,0.001976284584980237
+full_context,Full operating-context feature set,random_forest,2,0.1,0.2,847,0.14531771310501623,0.018890200708382526
+full_context,Full operating-context feature set,random_forest,3,0.2,0.30000000000000004,491,0.2461261503084554,0.07128309572301425
+full_context,Full operating-context feature set,random_forest,4,0.30000000000000004,0.4,386,0.3475668527166666,0.2616580310880829
+full_context,Full operating-context feature set,random_forest,5,0.4,0.5,306,0.4526223803307936,0.4673202614379085
+full_context,Full operating-context feature set,random_forest,6,0.5,0.6000000000000001,306,0.5494363218153697,0.6993464052287581
+full_context,Full operating-context feature set,random_forest,7,0.6000000000000001,0.7000000000000001,346,0.65253331585579,0.8121387283236994
+full_context,Full operating-context feature set,random_forest,8,0.7000000000000001,0.8,452,0.7510944149453033,0.9004424778761062
+full_context,Full operating-context feature set,random_forest,9,0.8,0.9,620,0.855116997703966,0.9822580645161291
+full_context,Full operating-context feature set,random_forest,10,0.9,1.0,3210,0.9736630093754336,0.9996884735202493
+full_context,Full operating-context feature set,adaboost,1,0.0,0.1,0,,
+full_context,Full operating-context feature set,adaboost,2,0.1,0.2,3066,0.15728222319673898,0.018590998043052837
+full_context,Full operating-context feature set,adaboost,3,0.2,0.30000000000000004,1295,0.2519250162876866,0.24247104247104248
+full_context,Full operating-context feature set,adaboost,4,0.30000000000000004,0.4,741,0.352378726192221,0.41970310391363025
+full_context,Full operating-context feature set,adaboost,5,0.4,0.5,734,0.4535591856997798,0.55858310626703
+full_context,Full operating-context feature set,adaboost,6,0.5,0.6000000000000001,382,0.5470650920424214,0.8403141361256544
+full_context,Full operating-context feature set,adaboost,7,0.6000000000000001,0.7000000000000001,529,0.6714205057023999,0.8071833648393195
+full_context,Full operating-context feature set,adaboost,8,0.7000000000000001,0.8,486,0.7685898689197097,0.9526748971193416
+full_context,Full operating-context feature set,adaboost,9,0.8,0.9,2767,0.8339306411820954,0.9822912902059993
+full_context,Full operating-context feature set,adaboost,10,0.9,1.0,0,,
+full_context,Full operating-context feature set,hist_gradient_boosting,1,0.0,0.1,4633,0.015685523427400993,0.004316857327865314
+full_context,Full operating-context feature set,hist_gradient_boosting,2,0.1,0.2,153,0.14266878138578792,0.13071895424836602
+full_context,Full operating-context feature set,hist_gradient_boosting,3,0.2,0.30000000000000004,67,0.24328085180756256,0.16417910447761194
+full_context,Full operating-context feature set,hist_gradient_boosting,4,0.30000000000000004,0.4,76,0.3424088345872674,0.3684210526315789
+full_context,Full operating-context feature set,hist_gradient_boosting,5,0.4,0.5,66,0.4491895311414372,0.4090909090909091
+full_context,Full operating-context feature set,hist_gradient_boosting,6,0.5,0.6000000000000001,74,0.5458728444841047,0.5405405405405406
+full_context,Full operating-context feature set,hist_gradient_boosting,7,0.6000000000000001,0.7000000000000001,58,0.6487518174791552,0.6896551724137931
+full_context,Full operating-context feature set,hist_gradient_boosting,8,0.7000000000000001,0.8,70,0.7548096934007883,0.7714285714285715
+full_context,Full operating-context feature set,hist_gradient_boosting,9,0.8,0.9,136,0.8582769562505177,0.8823529411764706
+full_context,Full operating-context feature set,hist_gradient_boosting,10,0.9,1.0,4667,0.9878953351478572,0.9987143775444611
+full_context,Full operating-context feature set,xgboost,1,0.0,0.1,4210,0.02055184839679384,0.003800475059382423
+full_context,Full operating-context feature set,xgboost,2,0.1,0.2,341,0.14128062559450127,0.04105571847507331
+full_context,Full operating-context feature set,xgboost,3,0.2,0.30000000000000004,202,0.24276325586113598,0.11386138613861387
+full_context,Full operating-context feature set,xgboost,4,0.30000000000000004,0.4,141,0.3485485630255219,0.2765957446808511
+full_context,Full operating-context feature set,xgboost,5,0.4,0.5,117,0.4509372189004197,0.4188034188034188
+full_context,Full operating-context feature set,xgboost,6,0.5,0.6000000000000001,101,0.5487073518262051,0.5841584158415841
+full_context,Full operating-context feature set,xgboost,7,0.6000000000000001,0.7000000000000001,134,0.6485905077920031,0.7686567164179104
+full_context,Full operating-context feature set,xgboost,8,0.7000000000000001,0.8,170,0.754802844804876,0.8941176470588236
+full_context,Full operating-context feature set,xgboost,9,0.8,0.9,376,0.8581849037015692,0.9574468085106383
+full_context,Full operating-context feature set,xgboost,10,0.9,1.0,4208,0.9847274916565237,0.9995247148288974
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",knn,1,0.0,0.1,1205,0.0,0.05228215767634855
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",knn,2,0.1,0.2,1286,0.14168334505946098,0.11275272161741835
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",knn,3,0.2,0.30000000000000004,1108,0.28339874044463614,0.19133574007220217
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",knn,4,0.30000000000000004,0.4,100,0.31968736816538645,0.32
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",knn,5,0.4,0.5,1125,0.428608908425601,0.35644444444444445
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",knn,6,0.5,0.6000000000000001,1126,0.5708089483584599,0.5488454706927176
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",knn,7,0.6000000000000001,0.7000000000000001,104,0.6893458809449025,0.6346153846153846
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",knn,8,0.7000000000000001,0.8,971,0.7166616420373977,0.7404737384140062
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",knn,9,0.8,0.9,1293,0.8580298047273975,0.8917246713070379
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",knn,10,0.9,1.0,1682,1.0,0.9583828775267539
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",naive_bayes,1,0.0,0.1,3565,0.006481548187519705,0.11921458625525946
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",naive_bayes,2,0.1,0.2,191,0.14821670054576686,0.24083769633507854
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",naive_bayes,3,0.2,0.30000000000000004,142,0.2458191174664476,0.2605633802816901
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",naive_bayes,4,0.30000000000000004,0.4,124,0.3504174968626014,0.29838709677419356
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",naive_bayes,5,0.4,0.5,101,0.451713174276333,0.297029702970297
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",naive_bayes,6,0.5,0.6000000000000001,118,0.5486629638318702,0.3813559322033898
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",naive_bayes,7,0.6000000000000001,0.7000000000000001,101,0.6520620346581832,0.3564356435643564
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",naive_bayes,8,0.7000000000000001,0.8,145,0.7534404633417147,0.4206896551724138
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",naive_bayes,9,0.8,0.9,229,0.8541540564980133,0.42358078602620086
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",naive_bayes,10,0.9,1.0,5284,0.9942864250963267,0.7961771385314156
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",decision_tree_gini,1,0.0,0.1,3320,0.01698896658410162,0.02530120481927711
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",decision_tree_gini,2,0.1,0.2,823,0.13761754973177534,0.16038882138517618
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",decision_tree_gini,3,0.2,0.30000000000000004,436,0.25395351104785807,0.27293577981651373
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",decision_tree_gini,4,0.30000000000000004,0.4,251,0.33788926853255935,0.3426294820717131
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",decision_tree_gini,5,0.4,0.5,306,0.42727495783613056,0.37254901960784315
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",decision_tree_gini,6,0.5,0.6000000000000001,279,0.559655909704055,0.4946236559139785
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",decision_tree_gini,7,0.6000000000000001,0.7000000000000001,129,0.6591367173387653,0.627906976744186
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",decision_tree_gini,8,0.7000000000000001,0.8,351,0.7411622434863918,0.7293447293447294
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",decision_tree_gini,9,0.8,0.9,219,0.8422498544274574,0.8310502283105022
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",decision_tree_gini,10,0.9,1.0,3886,0.9891124404715018,0.985331960885229
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",decision_tree_entropy,1,0.0,0.1,3229,0.014339049412852599,0.02322700526478786
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",decision_tree_entropy,2,0.1,0.2,1000,0.1458104196339201,0.162
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",decision_tree_entropy,3,0.2,0.30000000000000004,286,0.24182116179903385,0.2867132867132867
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",decision_tree_entropy,4,0.30000000000000004,0.4,326,0.3675809055000141,0.3619631901840491
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",decision_tree_entropy,5,0.4,0.5,398,0.43266144507714843,0.3969849246231156
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",decision_tree_entropy,6,0.5,0.6000000000000001,355,0.5578605274947745,0.49859154929577465
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",decision_tree_entropy,7,0.6000000000000001,0.7000000000000001,0,,
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",decision_tree_entropy,8,0.7000000000000001,0.8,274,0.7460454629729859,0.7700729927007299
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",decision_tree_entropy,9,0.8,0.9,324,0.8448120048759789,0.8425925925925926
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",decision_tree_entropy,10,0.9,1.0,3808,0.9932616384690673,0.9887079831932774
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",logistic_regression,1,0.0,0.1,3167,0.02136730646361914,0.029365329965266813
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",logistic_regression,2,0.1,0.2,639,0.14608759794344303,0.10641627543035993
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",logistic_regression,3,0.2,0.30000000000000004,435,0.24917706520973731,0.2
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",logistic_regression,4,0.30000000000000004,0.4,385,0.3485207115425832,0.32987012987012987
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",logistic_regression,5,0.4,0.5,340,0.45198277070347453,0.42058823529411765
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",logistic_regression,6,0.5,0.6000000000000001,342,0.5467823367706829,0.5321637426900585
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",logistic_regression,7,0.6000000000000001,0.7000000000000001,380,0.6506876993867021,0.6263157894736842
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",logistic_regression,8,0.7000000000000001,0.8,440,0.7522650999025419,0.7704545454545455
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",logistic_regression,9,0.8,0.9,655,0.8535346399944095,0.8824427480916031
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",logistic_regression,10,0.9,1.0,3217,0.9785681667274662,0.9841467205470935
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",random_forest,1,0.0,0.1,2003,0.04740411960402465,0.011482775836245632
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",random_forest,2,0.1,0.2,1217,0.14522285130035995,0.07641741988496302
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",random_forest,3,0.2,0.30000000000000004,807,0.2482087798808402,0.15613382899628253
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",random_forest,4,0.30000000000000004,0.4,651,0.34594499786693284,0.27035330261136714
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",random_forest,5,0.4,0.5,480,0.4478705970233516,0.4
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",random_forest,6,0.5,0.6000000000000001,437,0.549350919507344,0.5377574370709383
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",random_forest,7,0.6000000000000001,0.7000000000000001,468,0.6496166903915346,0.7350427350427351
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",random_forest,8,0.7000000000000001,0.8,626,0.752635895383576,0.8706070287539937
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",random_forest,9,0.8,0.9,967,0.8571221677747786,0.9793174767321613
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",random_forest,10,0.9,1.0,2344,0.9620914175072129,0.9982935153583617
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",adaboost,1,0.0,0.1,0,,
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",adaboost,2,0.1,0.2,2213,0.14965467972250898,0.05015815634884772
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",adaboost,3,0.2,0.30000000000000004,1675,0.23889933431122914,0.28059701492537314
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",adaboost,4,0.30000000000000004,0.4,1041,0.3530502836683051,0.2670509125840538
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",adaboost,5,0.4,0.5,916,0.45654903066910124,0.5709606986899564
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",adaboost,6,0.5,0.6000000000000001,661,0.550399462948021,0.7231467473524962
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",adaboost,7,0.6000000000000001,0.7000000000000001,537,0.6323973714298229,0.7895716945996276
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",adaboost,8,0.7000000000000001,0.8,1638,0.7489388953064184,0.8675213675213675
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",adaboost,9,0.8,0.9,1319,0.8388279125054279,0.9977255496588324
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",adaboost,10,0.9,1.0,0,,
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",hist_gradient_boosting,1,0.0,0.1,3345,0.032925620782396636,0.015246636771300448
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",hist_gradient_boosting,2,0.1,0.2,822,0.1407904737245381,0.145985401459854
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",hist_gradient_boosting,3,0.2,0.30000000000000004,393,0.24442313083790002,0.2697201017811705
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",hist_gradient_boosting,4,0.30000000000000004,0.4,293,0.3496165917591492,0.3242320819112628
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",hist_gradient_boosting,5,0.4,0.5,314,0.4506858164088227,0.4140127388535032
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",hist_gradient_boosting,6,0.5,0.6000000000000001,230,0.5476463060526248,0.5304347826086957
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",hist_gradient_boosting,7,0.6000000000000001,0.7000000000000001,196,0.6520516165861229,0.6122448979591837
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",hist_gradient_boosting,8,0.7000000000000001,0.8,271,0.7503018614709788,0.7675276752767528
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",hist_gradient_boosting,9,0.8,0.9,354,0.8580091801230261,0.8785310734463276
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",hist_gradient_boosting,10,0.9,1.0,3782,0.9805420356372171,0.9936541512427287
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",xgboost,1,0.0,0.1,2883,0.03480127758745129,0.013180714533472077
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",xgboost,2,0.1,0.2,1054,0.13929393399061468,0.10815939278937381
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",xgboost,3,0.2,0.30000000000000004,425,0.2458568091252271,0.1976470588235294
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",xgboost,4,0.30000000000000004,0.4,418,0.3501368591374758,0.2942583732057416
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",xgboost,5,0.4,0.5,403,0.44340702839583973,0.4044665012406948
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",xgboost,6,0.5,0.6000000000000001,253,0.5517029950741251,0.5375494071146245
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",xgboost,7,0.6000000000000001,0.7000000000000001,313,0.6534274578475343,0.731629392971246
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",xgboost,8,0.7000000000000001,0.8,327,0.7509384461499136,0.8042813455657493
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",xgboost,9,0.8,0.9,514,0.8576196524883523,0.9299610894941635
+reduced_context,"Reduced context without capacity, offered traffic, or synthetic deployment-area variables",xgboost,10,0.9,1.0,3410,0.9760062440749138,0.9950146627565982
+temporal_holdout,Session-preserving time-ordered holdout,knn,1,0.0,0.1,2220,0.0,0.016216216216216217
+temporal_holdout,Session-preserving time-ordered holdout,knn,2,0.1,0.2,978,0.14225832826095464,0.08384458077709611
+temporal_holdout,Session-preserving time-ordered holdout,knn,3,0.2,0.30000000000000004,834,0.28295703058957256,0.20863309352517986
+temporal_holdout,Session-preserving time-ordered holdout,knn,4,0.30000000000000004,0.4,62,0.3146655062286212,0.3387096774193548
+temporal_holdout,Session-preserving time-ordered holdout,knn,5,0.4,0.5,766,0.42873767843618826,0.412532637075718
+temporal_holdout,Session-preserving time-ordered holdout,knn,6,0.5,0.6000000000000001,860,0.5711659291073474,0.6058139534883721
+temporal_holdout,Session-preserving time-ordered holdout,knn,7,0.6000000000000001,0.7000000000000001,60,0.6831847616560031,0.7166666666666667
+temporal_holdout,Session-preserving time-ordered holdout,knn,8,0.7000000000000001,0.8,948,0.7164577243136134,0.7784810126582279
+temporal_holdout,Session-preserving time-ordered holdout,knn,9,0.8,0.9,1267,0.8580085908350077,0.9005524861878453
+temporal_holdout,Session-preserving time-ordered holdout,knn,10,0.9,1.0,2005,1.0,0.971571072319202
+temporal_holdout,Session-preserving time-ordered holdout,naive_bayes,1,0.0,0.1,3865,0.002876285509124711,0.08486416558861579
+temporal_holdout,Session-preserving time-ordered holdout,naive_bayes,2,0.1,0.2,97,0.14518648410856339,0.1958762886597938
+temporal_holdout,Session-preserving time-ordered holdout,naive_bayes,3,0.2,0.30000000000000004,74,0.2541227229043207,0.1891891891891892
+temporal_holdout,Session-preserving time-ordered holdout,naive_bayes,4,0.30000000000000004,0.4,52,0.3507570331250037,0.3269230769230769
+temporal_holdout,Session-preserving time-ordered holdout,naive_bayes,5,0.4,0.5,53,0.4589252511725786,0.2641509433962264
+temporal_holdout,Session-preserving time-ordered holdout,naive_bayes,6,0.5,0.6000000000000001,58,0.5514062088700432,0.2413793103448276
+temporal_holdout,Session-preserving time-ordered holdout,naive_bayes,7,0.6000000000000001,0.7000000000000001,61,0.6460446390436705,0.29508196721311475
+temporal_holdout,Session-preserving time-ordered holdout,naive_bayes,8,0.7000000000000001,0.8,81,0.751466815101432,0.3950617283950617
+temporal_holdout,Session-preserving time-ordered holdout,naive_bayes,9,0.8,0.9,145,0.8570303185730277,0.30344827586206896
+temporal_holdout,Session-preserving time-ordered holdout,naive_bayes,10,0.9,1.0,5514,0.9966223782945345,0.8197315923104824
+temporal_holdout,Session-preserving time-ordered holdout,decision_tree_gini,1,0.0,0.1,4433,0.006859879399082247,0.009474396571170765
+temporal_holdout,Session-preserving time-ordered holdout,decision_tree_gini,2,0.1,0.2,279,0.14343191337518077,0.14336917562724014
+temporal_holdout,Session-preserving time-ordered holdout,decision_tree_gini,3,0.2,0.30000000000000004,158,0.241205076958804,0.25316455696202533
+temporal_holdout,Session-preserving time-ordered holdout,decision_tree_gini,4,0.30000000000000004,0.4,0,,
+temporal_holdout,Session-preserving time-ordered holdout,decision_tree_gini,5,0.4,0.5,128,0.47825964997657994,0.4765625
+temporal_holdout,Session-preserving time-ordered holdout,decision_tree_gini,6,0.5,0.6000000000000001,105,0.5551958717424145,0.5238095238095238
+temporal_holdout,Session-preserving time-ordered holdout,decision_tree_gini,7,0.6000000000000001,0.7000000000000001,129,0.6482272844078923,0.7286821705426356
+temporal_holdout,Session-preserving time-ordered holdout,decision_tree_gini,8,0.7000000000000001,0.8,123,0.7463233409994271,0.7560975609756098
+temporal_holdout,Session-preserving time-ordered holdout,decision_tree_gini,9,0.8,0.9,134,0.8723261572481688,0.8582089552238806
+temporal_holdout,Session-preserving time-ordered holdout,decision_tree_gini,10,0.9,1.0,4511,0.9965846986377798,0.9931279095544225
+temporal_holdout,Session-preserving time-ordered holdout,decision_tree_entropy,1,0.0,0.1,4535,0.006990945495049925,0.010804851157662623
+temporal_holdout,Session-preserving time-ordered holdout,decision_tree_entropy,2,0.1,0.2,217,0.1482679776330459,0.17511520737327188
+temporal_holdout,Session-preserving time-ordered holdout,decision_tree_entropy,3,0.2,0.30000000000000004,71,0.2228402509133121,0.2676056338028169
+temporal_holdout,Session-preserving time-ordered holdout,decision_tree_entropy,4,0.30000000000000004,0.4,78,0.3326453178465279,0.28205128205128205
+temporal_holdout,Session-preserving time-ordered holdout,decision_tree_entropy,5,0.4,0.5,150,0.47790088176605183,0.64
+temporal_holdout,Session-preserving time-ordered holdout,decision_tree_entropy,6,0.5,0.6000000000000001,128,0.5595917651082056,0.546875
+temporal_holdout,Session-preserving time-ordered holdout,decision_tree_entropy,7,0.6000000000000001,0.7000000000000001,96,0.6202915405728681,0.6666666666666666
+temporal_holdout,Session-preserving time-ordered holdout,decision_tree_entropy,8,0.7000000000000001,0.8,50,0.7334436952559164,0.74
+temporal_holdout,Session-preserving time-ordered holdout,decision_tree_entropy,9,0.8,0.9,152,0.8446627012377208,0.8421052631578947
+temporal_holdout,Session-preserving time-ordered holdout,decision_tree_entropy,10,0.9,1.0,4523,0.9968844902858448,0.994251602918417
+temporal_holdout,Session-preserving time-ordered holdout,logistic_regression,1,0.0,0.1,4280,0.007297910206553077,0.007009345794392523
+temporal_holdout,Session-preserving time-ordered holdout,logistic_regression,2,0.1,0.2,225,0.14420551070383175,0.10666666666666667
+temporal_holdout,Session-preserving time-ordered holdout,logistic_regression,3,0.2,0.30000000000000004,167,0.2508462997898948,0.20958083832335328
+temporal_holdout,Session-preserving time-ordered holdout,logistic_regression,4,0.30000000000000004,0.4,146,0.3479661785295831,0.3904109589041096
+temporal_holdout,Session-preserving time-ordered holdout,logistic_regression,5,0.4,0.5,156,0.4495753800172193,0.4358974358974359
+temporal_holdout,Session-preserving time-ordered holdout,logistic_regression,6,0.5,0.6000000000000001,156,0.5488182824761729,0.532051282051282
+temporal_holdout,Session-preserving time-ordered holdout,logistic_regression,7,0.6000000000000001,0.7000000000000001,160,0.6500794843823363,0.68125
+temporal_holdout,Session-preserving time-ordered holdout,logistic_regression,8,0.7000000000000001,0.8,239,0.7541983427904693,0.7698744769874477
+temporal_holdout,Session-preserving time-ordered holdout,logistic_regression,9,0.8,0.9,313,0.8558242046288425,0.9297124600638977
+temporal_holdout,Session-preserving time-ordered holdout,logistic_regression,10,0.9,1.0,4158,0.9897695193465643,0.9954304954304954
+temporal_holdout,Session-preserving time-ordered holdout,random_forest,1,0.0,0.1,3185,0.03271581584735183,0.0037676609105180532
+temporal_holdout,Session-preserving time-ordered holdout,random_forest,2,0.1,0.2,829,0.14527321195981116,0.012062726176115802
+temporal_holdout,Session-preserving time-ordered holdout,random_forest,3,0.2,0.30000000000000004,447,0.24626234569624667,0.07606263982102908
+temporal_holdout,Session-preserving time-ordered holdout,random_forest,4,0.30000000000000004,0.4,319,0.3460274998240349,0.2601880877742947
+temporal_holdout,Session-preserving time-ordered holdout,random_forest,5,0.4,0.5,285,0.4517871400640015,0.5368421052631579
+temporal_holdout,Session-preserving time-ordered holdout,random_forest,6,0.5,0.6000000000000001,302,0.5521694012136905,0.6821192052980133
+temporal_holdout,Session-preserving time-ordered holdout,random_forest,7,0.6000000000000001,0.7000000000000001,351,0.6516941430564664,0.8034188034188035
+temporal_holdout,Session-preserving time-ordered holdout,random_forest,8,0.7000000000000001,0.8,380,0.7529947981130294,0.9131578947368421
+temporal_holdout,Session-preserving time-ordered holdout,random_forest,9,0.8,0.9,599,0.853802316041346,0.986644407345576
+temporal_holdout,Session-preserving time-ordered holdout,random_forest,10,0.9,1.0,3303,0.9739511543200211,0.9996972449288526
+temporal_holdout,Session-preserving time-ordered holdout,adaboost,1,0.0,0.1,0,,
+temporal_holdout,Session-preserving time-ordered holdout,adaboost,2,0.1,0.2,3142,0.15790619071999873,0.0241884150222788
+temporal_holdout,Session-preserving time-ordered holdout,adaboost,3,0.2,0.30000000000000004,1285,0.25386471170604424,0.21011673151750973
+temporal_holdout,Session-preserving time-ordered holdout,adaboost,4,0.30000000000000004,0.4,640,0.34693042707076044,0.415625
+temporal_holdout,Session-preserving time-ordered holdout,adaboost,5,0.4,0.5,747,0.45044451251435774,0.5850066934404283
+temporal_holdout,Session-preserving time-ordered holdout,adaboost,6,0.5,0.6000000000000001,372,0.5521334970211274,0.8413978494623656
+temporal_holdout,Session-preserving time-ordered holdout,adaboost,7,0.6000000000000001,0.7000000000000001,437,0.6756483121809089,0.8306636155606407
+temporal_holdout,Session-preserving time-ordered holdout,adaboost,8,0.7000000000000001,0.8,482,0.7669138536486327,0.941908713692946
+temporal_holdout,Session-preserving time-ordered holdout,adaboost,9,0.8,0.9,2895,0.833917645520961,0.9813471502590674
+temporal_holdout,Session-preserving time-ordered holdout,adaboost,10,0.9,1.0,0,,
+temporal_holdout,Session-preserving time-ordered holdout,hist_gradient_boosting,1,0.0,0.1,4671,0.015083636754890373,0.00449582530507386
+temporal_holdout,Session-preserving time-ordered holdout,hist_gradient_boosting,2,0.1,0.2,146,0.1449033225289533,0.13013698630136986
+temporal_holdout,Session-preserving time-ordered holdout,hist_gradient_boosting,3,0.2,0.30000000000000004,67,0.25121800012864465,0.208955223880597
+temporal_holdout,Session-preserving time-ordered holdout,hist_gradient_boosting,4,0.30000000000000004,0.4,50,0.34367684431708284,0.22
+temporal_holdout,Session-preserving time-ordered holdout,hist_gradient_boosting,5,0.4,0.5,48,0.44840929086703635,0.4375
+temporal_holdout,Session-preserving time-ordered holdout,hist_gradient_boosting,6,0.5,0.6000000000000001,53,0.5491953933006214,0.5471698113207547
+temporal_holdout,Session-preserving time-ordered holdout,hist_gradient_boosting,7,0.6000000000000001,0.7000000000000001,85,0.6471852631726539,0.6470588235294118
+temporal_holdout,Session-preserving time-ordered holdout,hist_gradient_boosting,8,0.7000000000000001,0.8,79,0.7541748388374946,0.810126582278481
+temporal_holdout,Session-preserving time-ordered holdout,hist_gradient_boosting,9,0.8,0.9,139,0.853044818019321,0.9280575539568345
+temporal_holdout,Session-preserving time-ordered holdout,hist_gradient_boosting,10,0.9,1.0,4662,0.9884427978689956,0.9989274989274989
+temporal_holdout,Session-preserving time-ordered holdout,xgboost,1,0.0,0.1,4281,0.019230511082569953,0.003737444522307872
+temporal_holdout,Session-preserving time-ordered holdout,xgboost,2,0.1,0.2,306,0.14186961851478402,0.02287581699346405
+temporal_holdout,Session-preserving time-ordered holdout,xgboost,3,0.2,0.30000000000000004,174,0.24751305203328186,0.11494252873563218
+temporal_holdout,Session-preserving time-ordered holdout,xgboost,4,0.30000000000000004,0.4,123,0.3545253560310457,0.2764227642276423
+temporal_holdout,Session-preserving time-ordered holdout,xgboost,5,0.4,0.5,115,0.4477737955425097,0.391304347826087
+temporal_holdout,Session-preserving time-ordered holdout,xgboost,6,0.5,0.6000000000000001,123,0.5506883699719499,0.6666666666666666
+temporal_holdout,Session-preserving time-ordered holdout,xgboost,7,0.6000000000000001,0.7000000000000001,134,0.6503057982494582,0.7985074626865671
+temporal_holdout,Session-preserving time-ordered holdout,xgboost,8,0.7000000000000001,0.8,168,0.7519183038246064,0.8690476190476191
+temporal_holdout,Session-preserving time-ordered holdout,xgboost,9,0.8,0.9,338,0.8608037914044758,0.9674556213017751
+temporal_holdout,Session-preserving time-ordered holdout,xgboost,10,0.9,1.0,4238,0.9849451303116383,0.9995280792826805

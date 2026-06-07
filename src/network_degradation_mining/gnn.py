@@ -247,10 +247,10 @@ def _degree_features(
 def _base_dataset(nodes: pd.DataFrame, edges: pd.DataFrame) -> pd.DataFrame:
     measurement = _warehouse_measurement_nodes(nodes)
     if measurement.empty:
-        raise ValueError("Graph benchmark requires warehouse measurement nodes.")
+        raise ValueError("Graph neural analysis requires warehouse measurement nodes.")
     if TARGET_COLUMN not in measurement.columns:
         raise ValueError(
-            f"Graph benchmark requires {TARGET_COLUMN} on measurement nodes."
+            f"Graph neural analysis requires {TARGET_COLUMN} on measurement nodes."
         )
 
     measurement = measurement.copy()
@@ -460,7 +460,7 @@ def _transition_split_audit(
             },
             {
                 "check_name": "gnn_inference_scope",
-                "check_value": "offline_observed_within_session_transition_benchmark",
+                "check_value": "offline_observed_within_session_transition_analysis",
                 "status": "ok",
             },
         ]
@@ -769,7 +769,7 @@ def _run_true_gnn_models(
             train_count=len(full_train_positions),
             test_count=len(test_positions),
         )
-        row["model_family"] = "true_gnn_optional_benchmark"
+        row["model_family"] = "graph_neural_transition_model"
         row["feature_source"] = "warehouse_context_features_and_transition_edges"
         row["best_validation_f1"] = float(best_validation_f1)
         row["best_epoch"] = int(best_epoch)
@@ -871,9 +871,9 @@ def _training_audit(
     feature_names = set(feature_set["feature_name"].astype(str))
     rows = [
         {
-            "check_name": "benchmark_role",
+            "check_name": "analysis_role",
             "check_value": (
-                "graph_predictive_benchmark_not_primary_claim_unless_results_justify"
+                "graph_predictive_analysis_reported_as_auxiliary_evidence"
             ),
             "status": "ok",
         },
@@ -888,7 +888,7 @@ def _training_audit(
             "status": "ok" if TARGET_COLUMN not in feature_names else "failed",
         },
         {
-            "check_name": "training_context_rates_excluded_from_default_benchmark",
+            "check_name": "training_context_rates_excluded_from_default_analysis",
             "check_value": 1,
             "status": "ok",
         },
@@ -916,7 +916,7 @@ def _training_audit(
     return pd.DataFrame(rows)
 
 
-def run_graph_neural_benchmark(
+def run_graph_neural_modeling(
     graph_nodes_path: str | Path,
     graph_edges_path: str | Path,
     results_dir: str | Path,
@@ -955,7 +955,7 @@ def run_graph_neural_benchmark(
             test_index=test_index,
             include_context_rates=include_context_rates,
         )
-        row["model_family"] = "graph_derived_benchmark"
+        row["model_family"] = "graph_context_logistic_model"
         row["feature_source"] = "warehouse_context_edges"
         model_rows.append(row)
         confusion_rows.extend(rows)

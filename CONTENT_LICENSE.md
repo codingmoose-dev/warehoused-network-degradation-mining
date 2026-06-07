@@ -36,7 +36,7 @@ This includes, but is not limited to:
 
 - external measurement datasets;
 - third-party raw network traces;
-- third-party benchmark or reference data;
+- third-party comparison or reference data;
 - simulator outputs generated from third-party tools;
 - any files copied from external repositories, archives, publications, or data portals.
 

@@ -12,7 +12,7 @@ if str(SRC) not in sys.path:
 
 def main() -> None:
     from network_degradation_mining.config import load_paths, resolve_project_path
-    from network_degradation_mining.gnn import run_graph_neural_benchmark
+    from network_degradation_mining.gnn import run_graph_neural_modeling
 
     paths = load_paths(ROOT / "config" / "paths.yaml")
 
@@ -31,7 +31,7 @@ def main() -> None:
         ROOT,
     )
 
-    output_paths = run_graph_neural_benchmark(
+    output_paths = run_graph_neural_modeling(
         graph_nodes_path=graph_nodes_path,
         graph_edges_path=graph_edges_path,
         results_dir=results_dir,
@@ -39,7 +39,7 @@ def main() -> None:
         supervised_model_comparison_path=supervised_model_comparison_path,
     )
 
-    print("Graph neural benchmark complete.")
+    print("Graph neural modeling complete.")
     for name, path in output_paths.items():
         print(f"{name}: {path.relative_to(ROOT)}")
 
