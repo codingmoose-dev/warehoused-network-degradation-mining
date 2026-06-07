@@ -34,6 +34,7 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
+from sklearn.svm import LinearSVC, SVC
 from sklearn.tree import DecisionTreeClassifier
 
 from network_degradation_mining.io import ensure_directory, read_csv, write_csv
@@ -76,6 +77,11 @@ SENSITIVITY_EXCLUDED_FEATURES = {
 
 MODEL_RANDOM_STATE = 42
 KNN_TRAIN_ROW_LIMIT = 15_000
+RBF_SVM_TRAIN_ROW_LIMIT = 8_000
+MODEL_TRAIN_ROW_LIMITS = {
+    "knn": KNN_TRAIN_ROW_LIMIT,
+    "rbf_svm": RBF_SVM_TRAIN_ROW_LIMIT,
+}
 PRIMARY_SPLIT_DESCRIPTION = "Session-grouped 80/20 holdout"
 PRIMARY_PREPROCESSING_DESCRIPTION = (
     "Median/mode imputation; numeric standard scaling; categorical one-hot encoding"
@@ -100,6 +106,8 @@ MODEL_FAMILIES = {
     "decision_tree_gini": "Tree",
     "decision_tree_entropy": "Tree",
     "logistic_regression": "Linear",
+    "linear_svm": "Linear SVM",
+    "rbf_svm": "Kernel SVM",
     "random_forest": "Ensemble tree",
     "adaboost": "Boosting",
     "hist_gradient_boosting": "Boosting",
@@ -252,6 +260,28 @@ def _model_specs() -> list[ModelSpec]:
                 max_iter=500,
                 solver="liblinear",
                 class_weight="balanced",
+                random_state=MODEL_RANDOM_STATE,
+            ),
+        ),
+        ModelSpec(
+            "linear_svm",
+            LinearSVC(
+                C=1.0,
+                class_weight="balanced",
+                dual=False,
+                max_iter=10_000,
+                random_state=MODEL_RANDOM_STATE,
+            ),
+        ),
+        ModelSpec(
+            "rbf_svm",
+            SVC(
+                kernel="rbf",
+                C=1.0,
+                gamma="scale",
+                class_weight="balanced",
+                probability=False,
+                cache_size=1024,
                 random_state=MODEL_RANDOM_STATE,
             ),
         ),
@@ -482,7 +512,8 @@ def _fit_training_subset(
     X_train: np.ndarray,
     y_train: pd.Series,
 ) -> tuple[np.ndarray, pd.Series]:
-    if model_name != "knn" or len(y_train) <= KNN_TRAIN_ROW_LIMIT:
+    row_limit = MODEL_TRAIN_ROW_LIMITS.get(model_name)
+    if row_limit is None or len(y_train) <= row_limit:
         return X_train, y_train
 
     rng = np.random.default_rng(MODEL_RANDOM_STATE)
@@ -491,19 +522,35 @@ def _fit_training_subset(
     selected: list[int] = []
     for label in sorted(set(class_values.tolist())):
         label_indices = indices[class_values == label]
-        label_quota = max(
-            1, int(KNN_TRAIN_ROW_LIMIT * len(label_indices) / len(y_train))
-        )
+        label_quota = max(1, int(row_limit * len(label_indices) / len(y_train)))
         label_quota = min(label_quota, len(label_indices))
         selected.extend(
             rng.choice(label_indices, size=label_quota, replace=False).tolist()
         )
-    if len(selected) > KNN_TRAIN_ROW_LIMIT:
-        selected = rng.choice(
-            selected, size=KNN_TRAIN_ROW_LIMIT, replace=False
-        ).tolist()
+    if len(selected) > row_limit:
+        selected = rng.choice(selected, size=row_limit, replace=False).tolist()
     selected = sorted(selected)
     return X_train[selected], y_train.iloc[selected]
+
+
+def _training_subset_note(
+    model_name: str,
+    original_train_row_count: int,
+    used_train_row_count: int,
+) -> str:
+    if used_train_row_count >= original_train_row_count:
+        return ""
+    if model_name == "knn":
+        return (
+            "Stratified training subset used to keep the instance-based "
+            "benchmark runtime bounded."
+        )
+    if model_name == "rbf_svm":
+        return (
+            "Stratified training subset used because exact RBF SVM training "
+            "scales poorly with dense one-hot features."
+        )
+    return "Stratified training subset used for runtime control."
 
 
 def _feature_set_frame(
@@ -649,8 +696,16 @@ def _run_model_experiment(
             )
             row["experiment_name"] = experiment_name
             row["experiment_label"] = experiment_label
+            notes = _training_subset_note(
+                model_name=spec.name,
+                original_train_row_count=len(y_train),
+                used_train_row_count=len(train_target),
+            )
             if experiment_name == "reduced_context":
-                row["notes"] = SENSITIVITY_NOTES
+                notes = "; ".join(
+                    note for note in [SENSITIVITY_NOTES, notes] if note
+                )
+            row["notes"] = notes
             rows.append(row)
 
             for confusion_row in _confusion_rows_from_predictions(

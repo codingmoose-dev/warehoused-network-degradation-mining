@@ -19,6 +19,14 @@ logistic_regression,not_degraded,not_degraded,4721,full_context,Full operating-c
 logistic_regression,not_degraded,degraded,258,full_context,Full operating-context feature set
 logistic_regression,degraded,not_degraded,208,full_context,Full operating-context feature set
 logistic_regression,degraded,degraded,4813,full_context,Full operating-context feature set
+linear_svm,not_degraded,not_degraded,4720,full_context,Full operating-context feature set
+linear_svm,not_degraded,degraded,259,full_context,Full operating-context feature set
+linear_svm,degraded,not_degraded,212,full_context,Full operating-context feature set
+linear_svm,degraded,degraded,4809,full_context,Full operating-context feature set
+rbf_svm,not_degraded,not_degraded,4678,full_context,Full operating-context feature set
+rbf_svm,not_degraded,degraded,301,full_context,Full operating-context feature set
+rbf_svm,degraded,not_degraded,257,full_context,Full operating-context feature set
+rbf_svm,degraded,degraded,4764,full_context,Full operating-context feature set
 random_forest,not_degraded,not_degraded,4765,full_context,Full operating-context feature set
 random_forest,not_degraded,degraded,214,full_context,Full operating-context feature set
 random_forest,degraded,not_degraded,301,full_context,Full operating-context feature set
