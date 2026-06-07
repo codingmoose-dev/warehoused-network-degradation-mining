@@ -1,37 +1,64 @@
 # Warehouse-Guided Mining and Modeling of Network Service Degradation Patterns
 
-This repository contains the code, configuration, tests, and generated study outputs for a warehouse-guided network service-degradation mining workflow.
+This repository contains the code, configuration, tests, and generated outputs for a warehouse-guided study of network service-degradation patterns. The workflow transforms session-level network-performance records into an analytical warehouse, derives mining-ready tables, evaluates degradation models, compares selected variables against external reference sources, and constructs graph views for degradation-pattern analysis.
 
-The study builds a warehouse-style analytical representation from session-level network-performance records, derives task-specific mining tables, evaluates classical mining and supervised models, compares selected variables against external references, and builds graph views for graph mining and graph neural benchmarking.
+## Analytical workflow
 
-The current working title is:
+The repository is organized into four analytical layers.
 
-> Warehouse-Guided Mining and Modeling of Network Service Degradation Patterns
+### Layer-1: Warehouse construction
 
-Use the longer title, *Warehouse-Guided Mining and Graph-Based Modeling of Network Service Degradation Patterns*, only if the graph and GNN sections become a major part of the manuscript.
+Session-level network-performance records are transformed into a fact table and context dimensions. The warehouse separates measurement records from time, area, device, network, radio, application, mobility, environmental, and service-state context.
 
-## Study scope
+### Layer-2: Mining-table preparation
 
-The repository is organized around one main analytical dataset and four external reference sources.
+Warehouse outputs are converted into task-specific tables for descriptive mining, supervised classification, decision-tree rule extraction, clustering, association-rule mining, external-reference comparison, and graph construction.
 
-| Dataset | Role in this repository |
+### Layer-3: Mining and modeling
+
+The study evaluates descriptive degradation signatures, session-grouped supervised degradation classifiers, pruned decision-tree rules, clustering profiles, and association rules.
+
+### Layer-4: Graph-based analysis
+
+Three graph views are constructed: a warehouse measurement graph, a context co-occurrence degradation graph, and an external-reference evidence graph. The graph layer summarizes degradation-related context pairs, organizes external-reference evidence, and evaluates auxiliary transition-graph neural benchmarks over warehouse measurement nodes.
+
+## Data sources
+
+| Dataset | Role |
 |---|---|
-| SynNetQoS | Main dataset for warehouse construction, degradation labels, descriptive mining, supervised classification, decision-tree rules, clustering, association rules, graph construction, and graph neural benchmarks. |
-| Vienna 4G/5G | External reference for selected signal/RSRP and throughput checks. |
-| Campus QoS | External reference for controlled throughput, jitter, loss, and offered-traffic checks. |
-| UCC 5G Context | External reference for production-trace signal, mobility, application context, and throughput checks. Throughput comparisons use Download-context rows where appropriate. |
+| SynNetQoS | Main dataset for warehouse construction, degradation labeling, mining, supervised modeling, graph construction, and graph neural benchmarking. |
+| Vienna 4G/5G | External reference for selected signal/RSRP and throughput comparisons. |
+| Campus QoS | External reference for controlled throughput, jitter, packet-loss, and offered-traffic comparisons. |
+| UCC 5G Context | External reference for production-trace signal, mobility, application context, and throughput comparisons. |
 | 5G-LENA/ns-3 | Controlled simulator reference for selected service-performance checks. |
 
-External references are not merged into the supervised training table. They are used for selected-variable reference checks and for the external-reference evidence graph.
+## Repository structure
+
+```text
+warehoused-network-degradation-mining/
+├─ config/                         # Dataset registry and path configuration
+├─ data/
+│  ├─ raw/                         # Raw datasets and external references
+│  ├─ interim/                     # Cleaned intermediate tables
+│  └─ processed/                   # Warehouse, mining, and graph tables
+├─ figures/                        # Generated figures
+├─ results/                        # Audits, model outputs, mining summaries, and graph outputs
+├─ scripts/                        # Reproducible pipeline entry points
+├─ src/network_degradation_mining/ # Reusable project modules
+└─ tests/                          # Repository tests
+```
 
 ## Pipeline
 
-Run scripts from the repository root.
+Run the pipeline from the repository root. Stage 02 prepares the external-reference tables. When regenerating the 5G-LENA/ns-3 reference from a local ns-3 build, set `NS3_ROOT` before running Stage 02.
 
 ```bash
 python scripts/00_audit_raw_inputs.py
 python scripts/01_prepare_synnetqos_core.py
+
+export NS3_ROOT=/path/to/ns-3
 python scripts/02_prepare_external_references.py
+
 python scripts/03_build_warehouse_tables.py
 python scripts/04_create_mining_feature_tables.py
 python scripts/05_descriptive_warehouse_mining.py
@@ -45,150 +72,134 @@ python scripts/12_graph_mining.py
 python scripts/13_gnn.py
 ```
 
-### Stage summary
+## Pipeline stages
 
-| Stage | Script | Purpose |
+| Stage | Script | Output focus |
 |---:|---|---|
-| 00 | `00_audit_raw_inputs.py` | Inventory registered raw inputs and record readable files, rows, columns, and read failures. |
-| 01 | `01_prepare_synnetqos_core.py` | Prepare the cleaned SynNetQoS core table. |
-| 02 | `02_prepare_external_references.py` | Prepare cleaned Vienna, Campus QoS, UCC 5G Context, and 5G-LENA/ns-3 reference tables. |
-| 03 | `03_build_warehouse_tables.py` | Build the warehouse fact table and dimensions. |
-| 04 | `04_create_mining_feature_tables.py` | Build supervised, clustering, association-rule, and external-reference summary tables from warehouse outputs. |
-| 05 | `05_descriptive_warehouse_mining.py` | Produce frequency tables, degradation-rate tables, cross-tabs, interaction matrices, and descriptive figures. |
-| 06 | `06_supervised_classification.py` | Run session-grouped supervised degradation classification with leakage-aware feature exclusions. |
-| 07 | `07_decision_tree_rule_extraction.py` | Train pruned decision-tree variants and export rule tables and representative paths. |
-| 08 | `08_clustering_analysis.py` | Run KMeans, hierarchical clustering, Gaussian mixture, DBSCAN, OPTICS, stability checks, profile summaries, and cluster figures. |
-| 09 | `09_association_rule_mining.py` | Mine Apriori and FP-Growth rules and export selected degradation-rule summaries. |
-| 10 | `10_external_reference_comparison.py` | Compare selected metrics against cleaned external references and export tables and figures. |
-| 11 | `11_build_graph_tables.py` | Build warehouse measurement, context co-occurrence, and external-reference graph tables. |
-| 12 | `12_graph_mining.py` | Summarize graph views, node/edge types, context-pair evidence, and external-reference graph evidence. |
-| 13 | `13_gnn.py` | Run graph-derived baseline and GraphSAGE/GCN transition benchmarks over warehouse measurement nodes. |
-
-## Main outputs
-
-The pipeline writes tables and figures under:
-
-```text
-results/
-figures/
-data/interim/
-data/processed/
-```
-
-Important result groups include:
-
-- `results/audits/` — raw input, cleaning, and label audits.
-- `results/warehouse/` — warehouse integrity and column-coverage checks.
-- `results/descriptive_mining/` — warehouse mining summaries and interaction tables.
-- `results/supervised/` — model metrics, confusion matrices, feature importance, and ranked model tables.
-- `results/decision_tree_rules/` — tree rules, leaf summaries, and rule reports.
-- `results/clustering/` — cluster validation, profiles, stability, and sensitivity outputs.
-- `results/association_rules/` — itemsets, rules, selected degradation rules, and rule-quality summaries.
-- `results/external_reference/` — selected-variable reference checks and external-reference audits.
-- `results/graph/` — graph summaries, context-pair evidence, external-reference graph summaries, and GNN benchmark outputs.
+| 00 | `00_audit_raw_inputs.py` | Raw input inventory and readability audit |
+| 01 | `01_prepare_synnetqos_core.py` | Cleaned SynNetQoS core table |
+| 02 | `02_prepare_external_references.py` | Cleaned external-reference tables |
+| 03 | `03_build_warehouse_tables.py` | Fact table and dimension tables |
+| 04 | `04_create_mining_feature_tables.py` | Supervised, clustering, association-rule, and external-reference summary tables |
+| 05 | `05_descriptive_warehouse_mining.py` | Frequency tables, degradation summaries, crosstabs, interaction matrices, and descriptive figures |
+| 06 | `06_supervised_classification.py` | Session-grouped supervised degradation-classification benchmarks |
+| 07 | `07_decision_tree_rule_extraction.py` | Pruned decision-tree rules and representative decision paths |
+| 08 | `08_clustering_analysis.py` | Clustering validation, profiles, stability checks, and cluster figures |
+| 09 | `09_association_rule_mining.py` | Frequent itemsets, association rules, and degradation-rule summaries |
+| 10 | `10_external_reference_comparison.py` | Selected-variable comparison against external reference sources |
+| 11 | `11_build_graph_tables.py` | Warehouse, context co-occurrence, and external-reference graph tables |
+| 12 | `12_graph_mining.py` | Graph summaries, context-pair evidence, and external-reference evidence summaries |
+| 13 | `13_gnn.py` | Graph-derived baseline and GraphSAGE/GCN transition benchmarks |
 
 ## Warehouse layer
 
-The warehouse layer uses a fact table and context dimensions:
+The warehouse layer contains one measurement fact table and nine context dimensions.
 
-- `fact_network_measurement`
-- `dim_time`
-- `dim_area`
-- `dim_device`
-- `dim_network`
-- `dim_radio`
-- `dim_application`
-- `dim_mobility`
-- `dim_environment`
-- `dim_service_state`
+```text
+fact_network_measurement
+dim_time
+dim_area
+dim_device
+dim_network
+dim_radio
+dim_application
+dim_mobility
+dim_environment
+dim_service_state
+```
 
-This design keeps the measurement record separate from time, network, radio, endpoint, application, mobility, environmental, and service-state context.
+The warehouse design supports reproducible joins for descriptive mining, supervised modeling, association-rule mining, clustering, external-reference comparison, and graph construction.
 
-## Modeling and mining layers
+## Graph layer
 
-The repository currently includes:
+The graph layer is built from three views.
 
-- descriptive warehouse mining;
-- supervised degradation classification;
-- decision-tree rule extraction;
-- clustering analysis;
-- association-rule mining;
-- selected-variable external-reference comparison;
-- warehouse/context/external-reference graph construction;
-- graph mining;
-- graph neural benchmarking.
+| Graph view | Purpose |
+|---|---|
+| Warehouse measurement graph | Represents measurement nodes, session membership, operating-context links, and within-session transitions. |
+| Context co-occurrence degradation graph | Represents pairs of operating-context values with row count, support, degradation rate, baseline rate, and degradation lift. |
+| External-reference evidence graph | Organizes source, metric, context, and comparison evidence from the external reference sources. |
 
-The supervised and graph-neural stages use session-grouped splitting where applicable. Target-definition fields are excluded from model features where they would directly restate the degradation label.
+The context co-occurrence graph is used for degradation-pattern evidence. The external-reference graph organizes comparison evidence while preserving dataset-specific measurement scope. GraphSAGE and GCN transition benchmarks are evaluated over warehouse measurement-transition structure.
 
-## Scope boundaries
+## Generated outputs
 
-The outputs should be reported as dataset-level mining and modeling evidence from the prepared warehouse tables.
+Generated outputs are written under `results/` and `figures/`.
 
-Do not describe the results as:
+| Directory | Contents |
+|---|---|
+| `results/audits/` | Raw input, cleaning, label, and column-profile audits |
+| `results/warehouse/` | Warehouse integrity and column-coverage checks |
+| `results/descriptive_mining/` | Degradation-rate summaries, frequency tables, crosstabs, and interaction tables |
+| `results/supervised/` | Model metrics, confusion matrices, ranked model tables, and feature importance |
+| `results/decision_tree_rules/` | Tree rules, leaf summaries, and representative rule paths |
+| `results/clustering/` | Cluster validation, profiles, stability checks, and sensitivity outputs |
+| `results/association_rules/` | Frequent itemsets, association rules, and selected degradation-rule summaries |
+| `results/external_reference/` | External-reference preparation, readiness, and selected-variable comparison outputs |
+| `results/graph/` | Graph-view summaries, context-pair evidence, external-reference graph summaries, and graph neural benchmark outputs |
 
-- deployment-ready prediction;
-- field validation of real-world 5G behavior;
-- evidence that association rules prove network mechanisms;
-- evidence that clusters are natural degradation classes;
-- evidence that external-reference rows were merged into supervised training;
-- evidence that external-reference graph nodes were used for prediction.
+## Figures
 
-The graph neural models are benchmark models over warehouse-derived measurement-transition structure. They are not the central claim unless their results clearly justify that role in the manuscript.
+The repository includes generated figures for the warehouse, mining, modeling, external-reference, and graph-analysis layers.
+
+![Warehouse star schema diagram](image.png)
+<p align="center"><em>Warehouse schema used to organize measurement records and operating-context dimensions.</em></p>
+
+![Top degradation context-pair lift](image-1.png)
+<p align="center"><em>Highest-lift operating-context pairs associated with degraded service states.</em></p>
+
+![Supervised model comparison](image-2.png)
+<p align="center"><em>Session-grouped supervised degradation-classification performance.</em></p>
+
+Additional generated figures are stored under `figures/descriptive_mining/`, `figures/external_reference/`, `figures/graph/`, `figures/supervised/`, and `figures/warehouse/`.
 
 ## Installation
 
-Create and activate a virtual environment, then install the project in editable mode.
+Create and activate a virtual environment.
 
 ```bash
 python -m venv .venv
 source .venv/bin/activate
 python -m pip install --upgrade pip
+```
+
+Install the project in editable mode with development dependencies.
+
+```bash
 python -m pip install -e ".[dev]"
 ```
 
-For graph neural benchmarking, install the optional GNN dependency group if it is not already available in your environment.
+Install optional graph-neural dependencies when running the transition-GNN benchmark.
 
 ```bash
 python -m pip install -e ".[gnn]"
 ```
 
-## Checks
+## Reproducibility checks
 
-Run the lightweight repository tests:
+Run the test suite.
 
 ```bash
 python -m pytest tests
 ```
 
-Run Ruff:
+Run Ruff.
 
 ```bash
 python -m ruff check scripts src/network_degradation_mining tests
 ```
 
-After rerunning the full pipeline, check whether tracked outputs changed:
+Inspect changed files after regenerating outputs.
 
 ```bash
 git status -sb
 git diff --name-status
 ```
 
-Regenerated PDF figures may change only because of PDF metadata. If the figure content is unchanged, restore the figure files before committing:
-
-```bash
-git restore -- figures/
-```
-
-If CSV or TXT outputs change, inspect the diff before restoring.
-
-## Data and external references
+## Data and licensing
 
 Raw datasets are expected under `data/raw/` according to `config/paths.yaml` and `config/dataset_registry.yaml`.
 
-Third-party datasets remain under their original licenses and citation requirements. This repository does not relicense third-party raw data. When preparing the manuscript, cite the dataset records and source publications for SynNetQoS, Vienna 4G/5G, Campus QoS, UCC 5G Context, and 5G-LENA/ns-3 as applicable.
+Third-party datasets remain under their original licenses and citation requirements. This repository does not relicense third-party raw data.
 
-## License
-
-Source code in this repository is released under the Apache License 2.0. Documentation, figures, and generated result tables authored in this repository are released under Creative Commons Attribution 4.0 International unless a file states otherwise.
-
-Third-party datasets, raw inputs, and external reference sources are governed by their own licenses and terms.
+Source code in this repository is released under the Apache License 2.0. Documentation, figures, and generated result tables authored in this repository are released under Creative Commons Attribution 4.0 International unless a file states otherwise. Third-party datasets, raw inputs, and external reference sources are governed by their own licenses and terms.
