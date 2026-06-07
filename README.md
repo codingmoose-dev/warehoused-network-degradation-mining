@@ -142,16 +142,25 @@ Generated outputs are written under `results/` and `figures/`.
 
 The repository includes generated figures for the warehouse, mining, modeling, external-reference, and graph-analysis layers.
 
-![Warehouse star schema diagram](image.png)
+<p align="center">
+  <img src="figures/readme/warehouse_star_schema.png" width="780" alt="Warehouse star schema diagram">
+</p>
+
 <p align="center"><em>Warehouse schema used to organize measurement records and operating-context dimensions.</em></p>
 
-![Top degradation context-pair lift](image-1.png)
+<p align="center">
+  <img src="figures/readme/top_degradation_context_pair_lift.png" width="780" alt="Top degradation context-pair lift">
+</p>
+
 <p align="center"><em>Highest-lift operating-context pairs associated with degraded service states.</em></p>
 
-![Supervised model comparison](image-2.png)
+<p align="center">
+  <img src="figures/readme/supervised_model_comparison.png" width="780" alt="Supervised model comparison">
+</p>
+
 <p align="center"><em>Session-grouped supervised degradation-classification performance.</em></p>
 
-Additional generated figures are stored under `figures/descriptive_mining/`, `figures/external_reference/`, `figures/graph/`, `figures/supervised/`, and `figures/warehouse/`.
+Additional generated figures are stored under figures/descriptive_mining/, figures/external_reference/, figures/graph/, figures/supervised/, and figures/warehouse/.
 
 ## Installation
 
