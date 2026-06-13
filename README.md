@@ -2,6 +2,16 @@
 
 This repository contains the code, configuration, tests, and generated outputs for a warehouse-guided study of network service-degradation patterns. The workflow transforms session-level network-performance records into an analytical warehouse, derives mining-ready tables, evaluates degradation models, compares selected variables against external reference sources, and constructs graph views for degradation-pattern analysis.
 
+## Citation
+
+Zenodo release for version `0.1.0`:
+
+```text
+Mostafa, M., Sarowar, S., Tanim, T. A., & Mohaimen-Bin-Noor. (2026). Warehouse-Guided Mining and Modeling of Network Service Degradation Patterns (Reproducibility Release) (0.1.0). Zenodo. https://doi.org/10.5281/zenodo.20670970
+```
+
+DOI: [10.5281/zenodo.20670970](https://doi.org/10.5281/zenodo.20670970)
+
 ## Analytical workflow
 
 The repository is organized into four analytical layers.
